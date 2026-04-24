@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf" class="auth-layout">
+  <q-layout view="lHh Lpr lFf" class="auth-layout" style="overflow: hidden">
     <div class="auth-container">
       <div class="auth-sidebar">
         <div class="circle-1"></div>
@@ -38,19 +38,15 @@
             </div>
           </div>
         </div>
-
-        <div class="auth-sidebar__footer">
-          &copy; 2026 IFBA — Instituto Federal da Bahia. Todos os direitos reservados.
-        </div>
       </div>
 
       <div class="auth-main">
         <q-page-container class="full-width">
-          <div class="auth-main-content">
-            <router-view />
-            <div class="auth-main-footer">© 2026 IFBA - Sistema de Gestão de Biblioteca</div>
-          </div>
+          <router-view />
         </q-page-container>
+        <footer class="auth-footer">
+          &copy; 2026 IFBA — Instituto Federal da Bahia. Todos os direitos reservados.
+        </footer>
       </div>
     </div>
   </q-layout>
@@ -61,18 +57,17 @@
 <style lang="scss" scoped>
 .auth-layout {
   background-color: $bg-light;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 .auth-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   width: 100%;
 }
 
 .auth-sidebar {
-  width: 50%;
-  max-width: 650px;
+  flex: 0 0 50%;
   background-color: $ifba-dark;
   color: white;
   padding: 56px;
@@ -113,8 +108,7 @@
     left: -50px;
   }
 
-  &__content,
-  &__footer {
+  &__content {
     position: relative;
     z-index: 1;
   }
@@ -178,16 +172,16 @@
 
   &__stats {
     display: flex;
-    gap: 16px;
+    gap: 24px;
   }
 
   &__stat-item {
     background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 14px;
+    padding: 24px;
+    border-radius: 16px;
     display: flex;
     flex-direction: column;
-    width: 180px;
+    width: 200px;
   }
 
   .stat-icon {
@@ -195,45 +189,39 @@
   }
 
   &__stat-label {
-    font-size: 11px;
-    color: #c8e6c9;
+    font-size: 12px;
+    color: #a5d6a7;
     margin-bottom: 4px;
   }
 
   &__stat-value {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
     color: white;
-  }
-
-  &__footer {
-    font-size: 11px;
-    color: #81c784;
   }
 }
 
 .auth-main {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-.auth-main-content {
-  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 32px;
-  width: 100%;
+  background-color: $bg-light;
+  position: relative;
+  overflow: hidden;
 }
 
-.auth-main-footer {
+.auth-footer {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  text-align: center;
   font-size: 13px;
   color: $text-light;
   font-weight: 500;
-  text-align: center;
+  z-index: 10;
 }
 
 @media (max-width: 1024px) {

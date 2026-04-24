@@ -1,11 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf" class="main-layout">
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      :width="280"
-      style="background-color: #174b28; color: white"
-    >
+    <q-drawer v-model="leftDrawerOpen" show-if-above :width="280" class="custom-drawer">
       <div class="sidebar-header">
         <div class="logo-box">
           <q-icon name="school" color="white" size="24px" />
@@ -19,7 +14,13 @@
       <q-scroll-area class="drawer-content">
         <div class="menu-label">MENU PRINCIPAL</div>
         <q-list class="menu-list">
-          <q-item clickable v-ripple active-class="menu-item--active" active class="menu-item">
+          <q-item
+            clickable
+            v-ripple
+            to="/dashboard"
+            active-class="menu-item--active"
+            class="menu-item"
+          >
             <q-item-section avatar class="item-icon-section">
               <div class="icon-box">
                 <q-icon name="dashboard" size="20px" />
@@ -27,17 +28,30 @@
             </q-item-section>
             <q-item-section class="item-text"> Dashboard </q-item-section>
             <q-item-section side>
-              <q-icon name="chevron_right" color="white" size="16px" />
+              <q-icon
+                name="chevron_right"
+                color="white"
+                size="16px"
+                v-if="$route.path === '/dashboard'"
+              />
             </q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple class="menu-item">
+          <q-item clickable v-ripple to="/loans" active-class="menu-item--active" class="menu-item">
             <q-item-section avatar class="item-icon-section">
               <div class="icon-box">
                 <q-icon name="swap_horiz" size="20px" />
               </div>
             </q-item-section>
             <q-item-section class="item-text"> Empréstimos </q-item-section>
+            <q-item-section side>
+              <q-icon
+                name="chevron_right"
+                color="white"
+                size="16px"
+                v-if="$route.path === '/loans'"
+              />
+            </q-item-section>
           </q-item>
 
           <q-item clickable v-ripple class="menu-item">
@@ -124,6 +138,13 @@ const logout = () => {
 }
 </script>
 
+<style lang="scss">
+.custom-drawer {
+  background-color: $ifba-darker !important;
+  color: white !important;
+}
+</style>
+
 <style lang="scss" scoped>
 .main-layout {
   min-height: 100vh;
@@ -180,7 +201,7 @@ const logout = () => {
 .menu-label {
   font-size: 11px;
   font-weight: 700;
-  color: #81c784;
+  color: $accent;
   padding: 24px 24px 8px 24px;
   letter-spacing: 0.5px;
 }

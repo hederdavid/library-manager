@@ -9,18 +9,10 @@
       </div>
 
       <div class="header-actions">
-        <q-input v-model="search" outlined dense class="search-input" placeholder="Busca rápida...">
-          <template v-slot:prepend>
-            <q-icon name="search" size="20px" color="grey-6" />
-          </template>
-        </q-input>
-
         <q-btn round flat class="notification-btn bg-white shadow-1">
           <q-icon name="notifications_none" color="grey-8" />
           <q-badge color="negative" floating rounded class="notification-dot"></q-badge>
         </q-btn>
-
-        <div class="admin-avatar">AD</div>
       </div>
     </div>
 
@@ -38,7 +30,7 @@
           <StatCard
             title="Total de Livros"
             :value="stats?.totalBooks?.value || 14"
-            changeText="~ +3 este mês"
+            changeText="+3 este mês"
             changeIcon="trending_up"
             description="8 disponíveis"
             icon="menu_book"
@@ -50,7 +42,7 @@
           <StatCard
             title="Empréstimos Ativos"
             :value="stats?.activeLoans?.value || 6"
-            changeText="~ +5 esta semana"
+            changeText="+5 esta semana"
             changeIcon="trending_up"
             description="de 12 alunos cadastrados"
             icon="swap_horiz"
@@ -151,34 +143,28 @@
           <q-card flat bordered class="list-card">
             <q-card-section class="list-header">
               <div class="flex items-center gap-sm">
-                <q-icon name="report_problem" color="negative" size="20px" />
+                <div class="header-icon-box bg-red-1">
+                  <q-icon name="report_problem" color="negative" size="20px" />
+                </div>
                 <div>
                   <div class="text-subtitle1 text-weight-bold text-main">Empréstimos Atrasados</div>
                   <div class="text-caption text-muted">Ação necessária</div>
                 </div>
               </div>
               <q-badge
-                color="negative"
-                class="header-badge q-pa-sm"
-                text-color="red"
-                style="background: rgba(244, 67, 54, 0.1)"
+                unelevated
+                class="header-badge"
+                style="background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca"
               >
-                5 atraso(s)
+                5 atrasos
               </q-badge>
             </q-card-section>
 
             <q-card-section class="q-pt-none">
-              <q-list separator class="custom-list">
+              <q-list class="custom-list">
                 <q-item v-for="i in 3" :key="i" class="list-item">
                   <q-item-section avatar>
-                    <q-badge
-                      color="negative"
-                      class="days-badge"
-                      text-color="red"
-                      style="background: rgba(244, 67, 54, 0.1)"
-                    >
-                      13d
-                    </q-badge>
+                    <div class="days-badge bg-red-1 text-negative">13d</div>
                   </q-item-section>
                   <q-item-section>
                     <q-item-label class="text-weight-bold text-main list-item-title"
@@ -189,7 +175,7 @@
                     >
                   </q-item-section>
                   <q-item-section side class="items-end">
-                    <q-item-label class="text-weight-bold text-negative"
+                    <q-item-label class="text-weight-bold text-negative opacity-80"
                       >13 dias atraso</q-item-label
                     >
                     <q-item-label caption>Venceu: 10/03</q-item-label>
@@ -204,34 +190,28 @@
           <q-card flat bordered class="list-card">
             <q-card-section class="list-header">
               <div class="flex items-center gap-sm">
-                <q-icon name="calendar_today" color="primary" size="20px" class="q-mr-sm" />
+                <div class="header-icon-box bg-green-1">
+                  <q-icon name="calendar_today" color="primary" size="20px" />
+                </div>
                 <div>
                   <div class="text-subtitle1 text-weight-bold text-main">Próximas Devoluções</div>
                   <div class="text-caption text-muted">Próximos 10 dias</div>
                 </div>
               </div>
               <q-badge
-                color="positive"
-                class="header-badge q-pa-sm"
-                text-color="green"
-                style="background: rgba(76, 175, 80, 0.1)"
+                unelevated
+                class="header-badge"
+                style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0"
               >
                 1 devol.
               </q-badge>
             </q-card-section>
 
             <q-card-section class="q-pt-none">
-              <q-list separator class="custom-list">
+              <q-list class="custom-list">
                 <q-item class="list-item">
                   <q-item-section avatar>
-                    <q-badge
-                      color="positive"
-                      class="days-badge"
-                      text-color="green"
-                      style="background: rgba(76, 175, 80, 0.1)"
-                    >
-                      8d
-                    </q-badge>
+                    <div class="days-badge bg-green-1 text-primary">8d</div>
                   </q-item-section>
                   <q-item-section>
                     <q-item-label class="text-weight-bold text-main list-item-title"
@@ -242,7 +222,7 @@
                     >
                   </q-item-section>
                   <q-item-section side class="items-end">
-                    <q-item-label caption class="text-weight-500">01/04/2026</q-item-label>
+                    <q-item-label caption class="text-weight-bold text-primary">01/04</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -263,7 +243,6 @@ import { useQuasar } from 'quasar'
 const $q = useQuasar()
 const loading = ref(true)
 const stats = ref(null)
-const search = ref('')
 
 const areaOptions = ref({
   chart: {
@@ -273,10 +252,10 @@ const areaOptions = ref({
   },
   dataLabels: { enabled: false },
   stroke: { curve: 'smooth', width: 3 },
-  colors: ['#4caf50'],
+  colors: ['#397b4f'],
   fill: {
     type: 'gradient',
-    gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0, stops: [0, 90, 100] },
+    gradient: { shadeIntensity: 1, opacityFrom: 0.2, opacityTo: 0, stops: [0, 90, 100] },
   },
   xaxis: {
     categories: ['Out', 'Nov', 'Dez', 'Jan', 'Fev', 'Mar'],
@@ -290,7 +269,7 @@ const areaOptions = ref({
   },
   grid: {
     strokeDashArray: 4,
-    borderColor: '#e0e0e0',
+    borderColor: '#f1f5f9',
   },
 })
 
@@ -308,7 +287,7 @@ const donutOptions = ref({
   stroke: { width: 2, colors: ['#fff'] },
   plotOptions: {
     pie: {
-      donut: { size: '65%' },
+      donut: { size: '70%' },
       expandOnClick: false,
     },
   },
@@ -321,10 +300,7 @@ onMounted(async () => {
     loading.value = true
     stats.value = await dashboardService.getStats()
   } catch (error) {
-    let msg = error
-    if (error && error.message) {
-      msg = error.message
-    }
+    let msg = error?.message || error
     $q.notify({
       color: 'negative',
       message: 'Erro ao carregar os dados do dashboard: ' + msg,
@@ -338,16 +314,16 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .dashboard-page {
-  background-color: #f8f9fa;
+  background-color: $bg-input;
   min-height: 100vh;
 }
 
 .text-main {
-  color: #2c3e50;
+  color: $text-main;
 }
 
 .text-muted {
-  color: #7f8c8d;
+  color: $text-muted;
 }
 
 .header-row {
@@ -370,51 +346,39 @@ onMounted(async () => {
   gap: 16px;
 }
 
-.search-input {
-  width: 250px;
-  background: white;
-  border-radius: 8px;
-}
-.search-input :deep(.q-field__control) {
-  border-radius: 8px;
-}
-
 .notification-btn {
   width: 44px;
   height: 44px;
-  border-radius: 50%;
+  border-radius: 12px;
+  background: white !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+  color: $text-muted;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $bg-input !important;
+    color: $primary;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08) !important;
+  }
 }
 
 .notification-dot {
-  width: 8px;
-  height: 8px;
-  min-height: 8px;
-  border-radius: 50%;
+  width: 9px;
+  height: 10px;
+  border: 2px solid white;
   padding: 0;
-  top: 8px;
-  right: 8px;
-}
-
-.admin-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #174b28;
-  color: white;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
+  top: 10px;
+  right: 10px;
 }
 
 .chart-card,
 .list-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 20px;
   border: 1px solid $border;
   height: 100%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
 .chart-header,
@@ -422,14 +386,23 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px;
+  padding: 24px 32px;
+}
+
+.header-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .chart-legend {
   display: flex;
   align-items: center;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: $text-muted;
 }
 
@@ -444,8 +417,8 @@ onMounted(async () => {
 .custom-donut-legend {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 0 32px 24px 32px;
+  gap: 14px;
+  padding: 0 32px 32px 32px;
 }
 
 .legend-row {
@@ -458,7 +431,8 @@ onMounted(async () => {
 .legend-label {
   display: flex;
   align-items: center;
-  color: $text-main;
+  color: $text-muted;
+  font-weight: 500;
 }
 
 .legend-label .dot {
@@ -475,38 +449,47 @@ onMounted(async () => {
 
 .header-badge {
   font-weight: 700;
-  border-radius: 6px;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
 }
 
 .custom-list {
-  padding: 0 16px;
+  padding: 0 16px 16px 16px;
 }
 
 .list-item {
-  padding: 16px 8px;
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
-}
-.list-item:last-child {
-  border-bottom: none;
+  padding: 20px 16px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: $bg-input;
+  }
 }
 
 .days-badge {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 800;
 }
 
 .list-item-title {
-  font-size: 14px;
-  margin-bottom: 2px;
+  font-size: 15px;
+  color: $text-main;
+}
+
+.opacity-80 {
+  opacity: 0.8;
 }
 
 .gap-sm {
-  gap: 12px;
+  gap: 16px;
 }
 </style>

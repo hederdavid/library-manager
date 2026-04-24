@@ -11,7 +11,7 @@
     </div>
 
     <div class="stat-body">
-      <div class="stat-value">{{ value }}</div>
+      <div class="stat-value" :class="`text-theme--${theme}`">{{ value }}</div>
       <div class="stat-title">{{ title }}</div>
       <div class="stat-desc">{{ description }}</div>
     </div>
@@ -46,6 +46,7 @@ defineProps({
   flex-direction: column;
   gap: 16px;
   height: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 }
 
 .stat-header {
@@ -55,69 +56,86 @@ defineProps({
 }
 
 .icon-box {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
 
   &--green {
-    background: rgba($primary, 0.1);
-    color: $primary;
+    background: $badge-green-bg;
+    color: $badge-green-text;
   }
   &--blue {
-    background: rgba($secondary, 0.1);
-    color: $secondary;
+    background: $badge-blue-bg;
+    color: $badge-blue-text;
   }
   &--red {
-    background: rgba($negative, 0.1);
-    color: $negative;
+    background: $badge-red-bg;
+    color: $badge-red-text;
   }
   &--orange {
-    background: rgba($warning, 0.1);
-    color: $warning;
+    background: $badge-orange-bg;
+    color: $badge-orange-text;
   }
 }
 
 .trend-badge {
   display: flex;
   align-items: center;
-  padding: 4px 8px;
-  border-radius: 8px;
+  padding: 4px 10px;
+  border-radius: 20px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
 
   &--green {
-    color: $primary;
+    background: $badge-green-bg;
+    color: $badge-green-text;
   }
   &--blue {
-    color: $secondary;
+    background: $badge-blue-bg;
+    color: $badge-blue-text;
   }
   &--red {
-    color: $negative;
+    background: $badge-red-bg;
+    color: $badge-red-text;
   }
   &--orange {
-    color: $warning;
+    background: $badge-red-bg;
+    color: $badge-red-text;
   }
 }
 
 .stat-body {
   display: flex;
   flex-direction: column;
+  margin-top: 8px;
 }
 
 .stat-value {
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1.1;
-  color: $text-main;
-  margin-bottom: 4px;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+
+  &.text-theme--green {
+    color: $badge-green-text;
+  }
+  &.text-theme--blue {
+    color: $badge-blue-text;
+  }
+  &.text-theme--red {
+    color: $badge-red-text;
+  }
+  &.text-theme--orange {
+    color: $badge-orange-text;
+  }
 }
 
 .stat-title {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: $text-main;
   margin-bottom: 2px;
 }
@@ -125,5 +143,6 @@ defineProps({
 .stat-desc {
   font-size: 12px;
   color: $text-muted;
+  font-weight: 500;
 }
 </style>
