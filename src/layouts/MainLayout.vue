@@ -63,13 +63,27 @@
             <q-item-section class="item-text"> Alunos </q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple class="menu-item">
+          <q-item
+            clickable
+            v-ripple
+            to="/turmas"
+            active-class="menu-item--active"
+            class="menu-item"
+          >
             <q-item-section avatar class="item-icon-section">
               <div class="icon-box">
                 <q-icon name="domain" size="20px" />
               </div>
             </q-item-section>
             <q-item-section class="item-text"> Turmas </q-item-section>
+            <q-item-section side>
+              <q-icon
+                name="chevron_right"
+                color="white"
+                size="16px"
+                v-if="$route.path === '/turmas'"
+              />
+            </q-item-section>
           </q-item>
 
           <q-item clickable v-ripple class="menu-item">
@@ -81,13 +95,53 @@
             <q-item-section class="item-text"> Livros </q-item-section>
           </q-item>
 
-          <q-item clickable v-ripple class="menu-item">
+          <q-item
+            clickable
+            v-ripple
+            to="/cursos"
+            active-class="menu-item--active"
+            class="menu-item"
+          >
             <q-item-section avatar class="item-icon-section">
               <div class="icon-box">
                 <q-icon name="bookmark" size="20px" />
               </div>
             </q-item-section>
             <q-item-section class="item-text"> Matérias </q-item-section>
+            <q-item-section side>
+              <q-icon
+                name="chevron_right"
+                color="white"
+                size="16px"
+                v-if="$route.path === '/cursos'"
+              />
+            </q-item-section>
+          </q-item>
+        </q-list>
+
+        <div class="menu-label q-mt-md">ADMINISTRAÇÃO</div>
+        <q-list class="menu-list">
+          <q-item
+            clickable
+            v-ripple
+            to="/campus"
+            active-class="menu-item--active"
+            class="menu-item"
+          >
+            <q-item-section avatar class="item-icon-section">
+              <div class="icon-box">
+                <q-icon name="location_city" size="20px" />
+              </div>
+            </q-item-section>
+            <q-item-section class="item-text"> Campus </q-item-section>
+            <q-item-section side>
+              <q-icon
+                name="chevron_right"
+                color="white"
+                size="16px"
+                v-if="$route.path === '/campus'"
+              />
+            </q-item-section>
           </q-item>
         </q-list>
       </q-scroll-area>

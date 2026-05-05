@@ -14,6 +14,9 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/DashboardPage.vue') },
       { path: '/loans', component: () => import('pages/LoansPage.vue') },
+      { path: '/turmas', component: () => import('pages/TurmaPage.vue') },
+      { path: '/cursos', component: () => import('pages/CursoPage.vue') },
+      { path: '/campus', component: () => import('pages/CampusPage.vue') },
     ],
   },
   {
