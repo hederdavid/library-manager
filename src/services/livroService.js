@@ -1,3 +1,5 @@
+import { mockConfig } from './mockConfig'
+
 let livros = [
   {
     id: 1,
@@ -25,11 +27,17 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, 200))
 
 export default {
   async findAll() {
+    if (!mockConfig.usarMockLivros) {
+      throw new Error('API de livros ainda não foi conectada no front.')
+    }
     await wait()
     return [...livros]
   },
 
   async create(data) {
+    if (!mockConfig.usarMockLivros) {
+      throw new Error('API de livros ainda não foi conectada no front.')
+    }
     await wait()
     const livro = { id: nextId++, ...data }
     livros = [livro, ...livros]
@@ -37,12 +45,18 @@ export default {
   },
 
   async update(id, data) {
+    if (!mockConfig.usarMockLivros) {
+      throw new Error('API de livros ainda não foi conectada no front.')
+    }
     await wait()
     livros = livros.map((livro) => (livro.id === id ? { id, ...data } : livro))
     return { id, ...data }
   },
 
   async remove(id) {
+    if (!mockConfig.usarMockLivros) {
+      throw new Error('API de livros ainda não foi conectada no front.')
+    }
     await wait()
     livros = livros.filter((livro) => livro.id !== id)
   },

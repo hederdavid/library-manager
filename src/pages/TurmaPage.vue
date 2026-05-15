@@ -18,70 +18,36 @@
       </q-btn>
     </div>
 
-    <div class="lib-card">
-      <div class="table-toolbar q-px-lg q-py-md">
-        <div class="table-toolbar__main-row">
-          <div>
-            <h2 class="text-h6 text-weight-bold text-main q-ma-none">Lista de Turmas</h2>
-            <p class="text-caption text-muted q-mt-xs q-mb-none">
-              {{ rows.length }} turma{{ rows.length !== 1 ? 's' : '' }} cadastrada{{ rows.length !== 1 ? 's' : '' }}
-            </p>
-          </div>
-          <q-input
-            v-model="filter"
-            outlined
-            dense
-            placeholder="Buscar turmas..."
-            class="table-search-input bg-white"
-            rounded
-          >
-            <template v-slot:prepend>
-              <q-icon name="search" size="20px" color="grey-5" />
-            </template>
-          </q-input>
-        </div>
-      </div>
+    <BaseDataTable
+      v-model:filter="filter"
+      title="Lista de Turmas"
+      :subtitle="`${rows.length} turma${rows.length !== 1 ? 's' : ''} cadastrada${rows.length !== 1 ? 's' : ''}`"
+      :rows="filteredRows"
+      :columns="columns"
+      :loading="loading"
+      search-placeholder="Buscar turmas..."
+      empty-label="Nenhuma turma cadastrada"
+      @edit="openEdit"
+      @delete="confirmDelete"
+    >
+      <template v-slot:body-cell-curso="props">
+        <q-td :props="props">
+          <span class="course-badge">{{
+            props.row.curso?.nomeCurso || cursosMap[props.row.idCurso] || `ID ${props.row.idCurso}`
+          }}</span>
+        </q-td>
+      </template>
 
-      <q-separator />
-
-      <q-table
-        flat
-        :rows="filteredRows"
-        :columns="columns"
-        row-key="id"
-        :loading="loading"
-        class="lib-table"
-        :pagination="{ rowsPerPage: 10 }"
-        no-data-label="Nenhuma turma cadastrada"
-      >
-        <template v-slot:body-cell-idCurso="props">
-          <q-td :props="props">
-            <span class="course-badge">{{ cursosMap[props.row.idCurso] || `ID ${props.row.idCurso}` }}</span>
-          </q-td>
-        </template>
-
-        <template v-slot:body-cell-idCampus="props">
-          <q-td :props="props">
-            {{ campusMap[props.row.idCampus] || `ID ${props.row.idCampus}` }}
-          </q-td>
-        </template>
-
-        <template v-slot:body-cell-actions="props">
-          <q-td :props="props">
-            <q-btn flat dense round icon="edit" color="primary" size="sm" @click="openEdit(props.row)">
-              <q-tooltip>Editar</q-tooltip>
-            </q-btn>
-            <q-btn flat dense round icon="delete_outline" color="negative" size="sm" class="q-ml-xs" @click="confirmDelete(props.row)">
-              <q-tooltip>Excluir</q-tooltip>
-            </q-btn>
-          </q-td>
-        </template>
-
-        <template v-slot:loading>
-          <q-inner-loading showing color="primary" />
-        </template>
-      </q-table>
-    </div>
+      <template v-slot:body-cell-campus="props">
+        <q-td :props="props">
+          {{
+            props.row.campus
+              ? `${props.row.campus.nome} — ${props.row.campus.cidade}`
+              : campusMap[props.row.idCampus] || `ID ${props.row.idCampus}`
+          }}
+        </q-td>
+      </template>
+    </BaseDataTable>
 
     <TurmaFormDialog
       v-model="dialogOpen"
@@ -98,7 +64,9 @@
     <ConfirmDialog
       v-model="confirmOpen"
       title="Excluir Turma"
-      :message="`Deseja excluir a turma <strong>${pendingDelete?.serie} — ${pendingDelete?.anoLetivo}</strong>? Esta ação não pode ser desfeita.`"
+      message="Deseja excluir a turma "
+      :highlight="pendingDelete ? `${pendingDelete.serie} - ${pendingDelete.anoLetivo}` : ''"
+      details="? Esta ação não pode ser desfeita."
       icon="delete_outline"
       icon-theme="red"
       confirm-label="Excluir"
@@ -110,6 +78,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import BaseDataTable from 'src/components/base/BaseDataTable.vue'
 import StatCardMini from 'src/components/StatCardMini.vue'
 import ConfirmDialog from 'src/components/ConfirmDialog.vue'
 import TurmaFormDialog from 'src/components/crud/TurmaFormDialog.vue'
@@ -123,11 +92,31 @@ const campus = ref([])
 const cursos = ref([])
 
 const {
-  loading, saving, deleting, rows, dialogOpen, editingId, errors, form,
-  confirmOpen, pendingDelete, load, openCreate, openEdit, closeDialog, save, confirmDelete, handleDelete,
+  loading,
+  saving,
+  deleting,
+  rows,
+  dialogOpen,
+  editingId,
+  errors,
+  form,
+  confirmOpen,
+  pendingDelete,
+  load,
+  openCreate,
+  openEdit,
+  closeDialog,
+  save,
+  confirmDelete,
+  handleDelete,
 } = useCrud({
   service: turmaService,
-  emptyForm: () => ({ anoLetivo: new Date().getFullYear(), serie: '', idCurso: null, idCampus: null }),
+  emptyForm: () => ({
+    anoLetivo: new Date().getFullYear(),
+    serie: '',
+    idCurso: null,
+    idCampus: null,
+  }),
   validate: (f) => {
     const e = {}
     if (!f.anoLetivo || f.anoLetivo < 2000) e.anoLetivo = 'Ano letivo deve ser 2000 ou superior'
@@ -157,15 +146,19 @@ const columns = [
   { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
   { name: 'anoLetivo', label: 'ANO LETIVO', field: 'anoLetivo', align: 'left', sortable: true },
   { name: 'serie', label: 'SÉRIE', field: 'serie', align: 'left', sortable: true },
-  { name: 'idCurso', label: 'MATÉRIA', field: 'idCurso', align: 'left' },
-  { name: 'idCampus', label: 'CAMPUS', field: 'idCampus', align: 'left' },
+  { name: 'curso', label: 'MATÉRIA', field: 'curso', align: 'left' },
+  { name: 'campus', label: 'CAMPUS', field: 'campus', align: 'left' },
   { name: 'actions', label: 'AÇÕES', field: 'actions', align: 'center', sortable: false },
 ]
 
-const cursosMap = computed(() => Object.fromEntries(cursos.value.map((c) => [c.id, c.nome_curso])))
-const campusMap = computed(() => Object.fromEntries(campus.value.map((c) => [c.id, `${c.nome} — ${c.cidade}`])))
-const cursoOptions = computed(() => cursos.value.map((c) => ({ label: c.nome_curso, value: c.id })))
-const campusOptions = computed(() => campus.value.map((c) => ({ label: `${c.nome} — ${c.cidade}`, value: c.id })))
+const cursosMap = computed(() => Object.fromEntries(cursos.value.map((c) => [c.id, c.nomeCurso])))
+const campusMap = computed(() =>
+  Object.fromEntries(campus.value.map((c) => [c.id, `${c.nome} — ${c.cidade}`])),
+)
+const cursoOptions = computed(() => cursos.value.map((c) => ({ label: c.nomeCurso, value: c.id })))
+const campusOptions = computed(() =>
+  campus.value.map((c) => ({ label: `${c.nome} — ${c.cidade}`, value: c.id })),
+)
 
 const filteredRows = computed(() => {
   if (!filter.value.trim()) return rows.value

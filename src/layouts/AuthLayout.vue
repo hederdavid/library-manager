@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf" class="auth-layout" style="overflow: hidden">
+  <q-layout view="lHh Lpr lFf" class="auth-layout">
     <div class="auth-container">
       <div class="auth-sidebar">
         <div class="circle-1"></div>
@@ -58,6 +58,7 @@
 .auth-layout {
   background-color: $bg-light;
   height: 100vh;
+  overflow: hidden;
 }
 
 .auth-container {

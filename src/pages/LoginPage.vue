@@ -7,35 +7,22 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useQuasar } from 'quasar'
 import LoginForm from 'src/components/LoginForm.vue'
+import { useNotify } from 'src/composables/useNotify'
 import authService from 'src/services/authService'
 
 const router = useRouter()
-const $q = useQuasar()
+const notify = useNotify()
 const loading = ref(false)
 
 const handleLogin = async (credentials) => {
   loading.value = true
   try {
-    // Simulando um delay de requisição para dar o efeito de login
-    await new Promise(resolve => setTimeout(resolve, 500))
-    // await authService.login(credentials.email, credentials.password)
-    
-    $q.notify({
-      color: 'positive',
-      position: 'top-right',
-      message: 'Login realizado com sucesso!',
-      icon: 'check_circle',
-    })
+    await authService.login(credentials)
+    notify.success('Login realizado com sucesso!', { icon: 'check_circle' })
     router.push('/painel')
   } catch (error) {
-    $q.notify({
-      color: 'negative',
-      position: 'top-right',
-      message: error.message || 'Erro ao realizar login',
-      icon: 'error',
-    })
+    notify.error(error, { fallbackMessage: 'Erro ao realizar login' })
   } finally {
     loading.value = false
   }

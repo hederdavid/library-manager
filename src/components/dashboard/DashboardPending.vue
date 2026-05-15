@@ -12,13 +12,7 @@
               <div class="text-caption text-muted">Ação necessária</div>
             </div>
           </div>
-          <q-badge
-            unelevated
-            class="header-badge"
-            style="background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca"
-          >
-            5 atrasos
-          </q-badge>
+          <q-badge unelevated class="header-badge header-badge--danger"> 5 atrasos </q-badge>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -31,9 +25,7 @@
                 <q-item-label class="text-weight-bold text-main list-item-title"
                   >Maria Fernanda Santos</q-item-label
                 >
-                <q-item-label caption class="text-muted"
-                  >Algoritmos: Teoria e Prática</q-item-label
-                >
+                <q-item-label caption class="text-muted">Algoritmos: Teoria e Prática</q-item-label>
               </q-item-section>
               <q-item-section side class="items-end">
                 <q-item-label class="text-weight-bold text-negative opacity-80"
@@ -59,13 +51,7 @@
               <div class="text-caption text-muted">Próximos 10 dias</div>
             </div>
           </div>
-          <q-badge
-            unelevated
-            class="header-badge"
-            style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0"
-          >
-            1 devol.
-          </q-badge>
+          <q-badge unelevated class="header-badge header-badge--success"> 1 devol. </q-badge>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
@@ -78,7 +64,7 @@
                 <q-item-label class="text-weight-bold text-main list-item-title"
                   >João Pedro Silva</q-item-label
                 >
-                <q-item-label caption class="text-muted text-ellipsis" style="max-width: 180px"
+                <q-item-label caption class="text-muted text-ellipsis pending-book-title"
                   >Programação Orientada a Objetos - INF-013</q-item-label
                 >
               </q-item-section>
@@ -123,6 +109,18 @@
   border-radius: 20px;
   padding: 6px 12px;
   font-size: 12px;
+
+  &--danger {
+    background: $tag-red-bg;
+    color: $tag-red-text;
+    border: 1px solid rgba(#f44336, 0.22);
+  }
+
+  &--success {
+    background: $tag-green-bg;
+    color: $tag-green-text;
+    border: 1px solid rgba(#4caf50, 0.22);
+  }
 }
 
 .custom-list {
@@ -158,6 +156,10 @@
 
 .opacity-80 {
   opacity: 0.8;
+}
+
+.pending-book-title {
+  max-width: 180px;
 }
 
 .gap-sm {

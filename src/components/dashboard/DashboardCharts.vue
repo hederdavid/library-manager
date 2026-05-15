@@ -34,27 +34,19 @@
 
         <q-card-section class="custom-donut-legend">
           <div class="legend-row">
-            <div class="legend-label">
-              <span class="dot" style="background: #397b4f"></span> Novo
-            </div>
+            <div class="legend-label"><span class="dot dot--novo"></span> Novo</div>
             <div class="legend-value text-weight-bold">3</div>
           </div>
           <div class="legend-row">
-            <div class="legend-label">
-              <span class="dot" style="background: #4caf50"></span> Bom
-            </div>
+            <div class="legend-label"><span class="dot dot--bom"></span> Bom</div>
             <div class="legend-value text-weight-bold">7</div>
           </div>
           <div class="legend-row">
-            <div class="legend-label">
-              <span class="dot" style="background: #ff9800"></span> Regular
-            </div>
+            <div class="legend-label"><span class="dot dot--regular"></span> Regular</div>
             <div class="legend-value text-weight-bold">3</div>
           </div>
           <div class="legend-row">
-            <div class="legend-label">
-              <span class="dot" style="background: #f44336"></span> Ruim
-            </div>
+            <div class="legend-label"><span class="dot dot--ruim"></span> Ruim</div>
             <div class="legend-value text-weight-bold">1</div>
           </div>
         </q-card-section>
@@ -177,6 +169,22 @@ const donutSeries = ref([3, 7, 3, 1])
   border-radius: 50%;
   display: inline-block;
   margin-right: 12px;
+}
+
+.dot--novo {
+  background: #397b4f;
+}
+
+.dot--bom {
+  background: #4caf50;
+}
+
+.dot--regular {
+  background: #ff9800;
+}
+
+.dot--ruim {
+  background: #f44336;
 }
 
 .legend-value {

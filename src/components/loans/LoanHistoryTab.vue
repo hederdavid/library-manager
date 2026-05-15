@@ -3,6 +3,7 @@
     <div class="row items-center q-col-gutter-md q-mb-lg">
       <div class="col">
         <q-input
+          v-model="loansStore.historySearch"
           outlined
           dense
           placeholder="Buscar por aluno, matrícula, livro ou código..."
@@ -20,7 +21,7 @@
           v-model="loansStore.statusFilter"
           :options="['Todos os status', 'Ativo', 'Devolvido', 'Atrasado']"
           bg-color="white"
-          style="min-width: 150px"
+          class="status-filter"
         />
       </div>
     </div>
@@ -28,21 +29,17 @@
     <q-table
       flat
       bordered
-      :rows="loansStore.historyRows"
+      :rows="loansStore.filteredHistoryRows"
       :columns="loansStore.historyColumns"
       row-key="id"
       class="history-table"
       :pagination="{ rowsPerPage: 10 }"
+      no-data-label="Nenhum empréstimo encontrado"
     >
       <template v-slot:body-cell-condition="props">
         <q-td :props="props">
           <div class="flex items-center gap-xs">
-            <q-icon
-              name="north"
-              size="12px"
-              color="positive"
-              v-if="props.value === 'Novo'"
-            />
+            <q-icon name="north" size="12px" color="positive" v-if="props.value === 'Novo'" />
             <span class="condition-tag" :class="`tag--${props.value.toLowerCase()}`">{{
               props.value
             }}</span>
@@ -52,11 +49,7 @@
 
       <template v-slot:body-cell-status="props">
         <q-td :props="props">
-          <q-badge
-            unelevated
-            class="status-badge"
-            :class="`status--${props.value.toLowerCase()}`"
-          >
+          <q-badge unelevated class="status-badge" :class="`status--${props.value.toLowerCase()}`">
             <q-icon
               :name="
                 props.value === 'Atrasado'
@@ -108,6 +101,10 @@ const loansStore = useLoansStore()
   :deep(tbody tr td) {
     padding: 16px;
   }
+}
+
+.status-filter {
+  min-width: 150px;
 }
 
 .condition-tag {

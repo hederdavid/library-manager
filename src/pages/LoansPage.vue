@@ -1,5 +1,10 @@
 <template>
   <q-page padding class="q-px-xl q-pb-xl q-pt-lg loans-page">
+    <MockDataBanner
+      :show="loansStore.usandoMockEmprestimos"
+      message="Dados demonstrativos: o backend ainda não possui API de empréstimos e devoluções."
+    />
+
     <div class="row q-col-gutter-lg q-mb-xl">
       <div class="col-12 col-md-4">
         <StatCardMini title="Ativos" value="6" icon="schedule" theme="blue" />
@@ -60,6 +65,7 @@
 
 <script setup>
 import StatCardMini from 'src/components/StatCardMini.vue'
+import MockDataBanner from 'src/components/base/MockDataBanner.vue'
 import LoanNewTab from 'src/components/loans/LoanNewTab.vue'
 import LoanReturnTab from 'src/components/loans/LoanReturnTab.vue'
 import LoanHistoryTab from 'src/components/loans/LoanHistoryTab.vue'
@@ -69,7 +75,6 @@ const loansStore = useLoansStore()
 </script>
 
 <style lang="scss" scoped>
-
 .loans-content-card {
   background: white;
   border-radius: 20px;

@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { mockConfig } from 'src/services/mockConfig'
 
 export const useLoansStore = defineStore('loans', () => {
   const tab = ref('new')
   const searchingBook = ref(false)
   const returnCode = ref('')
   const statusFilter = ref('Todos os status')
+  const historySearch = ref('')
 
   const form = ref({
     student: null,
@@ -87,6 +89,25 @@ export const useLoansStore = defineStore('loans', () => {
     },
   ])
 
+  const usandoMockEmprestimos = computed(() => mockConfig.usarMockEmprestimos)
+
+  const filteredHistoryRows = computed(() => {
+    const search = historySearch.value.trim().toLowerCase()
+    const status = statusFilter.value
+
+    return historyRows.value.filter((row) => {
+      const matchesStatus = status === 'Todos os status' || row.status === status
+      const matchesSearch =
+        !search ||
+        row.studentName.toLowerCase().includes(search) ||
+        row.studentId.toLowerCase().includes(search) ||
+        row.bookTitle.toLowerCase().includes(search) ||
+        row.bookCode.toLowerCase().includes(search)
+
+      return matchesStatus && matchesSearch
+    })
+  })
+
   function resetForm() {
     form.value = {
       student: null,
@@ -102,10 +123,13 @@ export const useLoansStore = defineStore('loans', () => {
     searchingBook,
     returnCode,
     statusFilter,
+    historySearch,
     form,
     studentOptions,
     historyColumns,
     historyRows,
+    filteredHistoryRows,
+    usandoMockEmprestimos,
     resetForm,
   }
 })

@@ -6,57 +6,18 @@
       </q-btn>
     </div>
 
-    <div class="lib-card">
-      <div class="table-toolbar q-px-lg q-py-md">
-        <div class="table-toolbar__main-row">
-          <div>
-            <h2 class="text-h6 text-weight-bold text-main q-ma-none">Lista de Campus</h2>
-            <p class="text-caption text-muted q-mt-xs q-mb-none">
-              {{ rows.length }} campus cadastrado{{ rows.length !== 1 ? 's' : '' }}
-            </p>
-          </div>
-          <q-input
-            v-model="filter"
-            outlined
-            dense
-            placeholder="Buscar campus..."
-            class="table-search-input bg-white"
-            rounded
-          >
-            <template v-slot:prepend>
-              <q-icon name="search" size="20px" color="grey-5" />
-            </template>
-          </q-input>
-        </div>
-      </div>
-
-      <q-separator />
-
-      <q-table
-        flat
-        :rows="filteredRows"
-        :columns="columns"
-        row-key="id"
-        :loading="loading"
-        class="lib-table"
-        :pagination="{ rowsPerPage: 10 }"
-        no-data-label="Nenhum campus cadastrado"
-      >
-        <template v-slot:body-cell-actions="props">
-          <q-td :props="props">
-            <q-btn flat dense round icon="edit" color="primary" size="sm" @click="openEdit(props.row)">
-              <q-tooltip>Editar</q-tooltip>
-            </q-btn>
-            <q-btn flat dense round icon="delete_outline" color="negative" size="sm" class="q-ml-xs" @click="confirmDelete(props.row)">
-              <q-tooltip>Excluir</q-tooltip>
-            </q-btn>
-          </q-td>
-        </template>
-        <template v-slot:loading>
-          <q-inner-loading showing color="primary" />
-        </template>
-      </q-table>
-    </div>
+    <BaseDataTable
+      v-model:filter="filter"
+      title="Lista de Campus"
+      :subtitle="`${rows.length} campus cadastrado${rows.length !== 1 ? 's' : ''}`"
+      :rows="filteredRows"
+      :columns="columns"
+      :loading="loading"
+      search-placeholder="Buscar campus..."
+      empty-label="Nenhum campus cadastrado"
+      @edit="openEdit"
+      @delete="confirmDelete"
+    />
 
     <CampusFormDialog
       v-model="dialogOpen"
@@ -71,7 +32,9 @@
     <ConfirmDialog
       v-model="confirmOpen"
       title="Excluir Campus"
-      :message="`Deseja excluir o campus <strong>${pendingDelete?.nome}</strong>? Esta ação não pode ser desfeita.`"
+      message="Deseja excluir o campus "
+      :highlight="pendingDelete?.nome"
+      details="? Esta ação não pode ser desfeita."
       icon="delete_outline"
       icon-theme="red"
       confirm-label="Excluir"
@@ -83,6 +46,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import BaseDataTable from 'src/components/base/BaseDataTable.vue'
 import ConfirmDialog from 'src/components/ConfirmDialog.vue'
 import CampusFormDialog from 'src/components/crud/CampusFormDialog.vue'
 import { useCrud } from 'src/composables/useCrud'
@@ -91,8 +55,23 @@ import campusService from 'src/services/campusService'
 const filter = ref('')
 
 const {
-  loading, saving, deleting, rows, dialogOpen, editingId, errors, form,
-  confirmOpen, pendingDelete, load, openCreate, openEdit, closeDialog, save, confirmDelete, handleDelete,
+  loading,
+  saving,
+  deleting,
+  rows,
+  dialogOpen,
+  editingId,
+  errors,
+  form,
+  confirmOpen,
+  pendingDelete,
+  load,
+  openCreate,
+  openEdit,
+  closeDialog,
+  save,
+  confirmDelete,
+  handleDelete,
 } = useCrud({
   service: campusService,
   emptyForm: () => ({ nome: '', cidade: '' }),
@@ -119,7 +98,9 @@ const columns = [
 const filteredRows = computed(() => {
   if (!filter.value.trim()) return rows.value
   const q = filter.value.toLowerCase()
-  return rows.value.filter((r) => r.nome?.toLowerCase().includes(q) || r.cidade?.toLowerCase().includes(q))
+  return rows.value.filter(
+    (r) => r.nome?.toLowerCase().includes(q) || r.cidade?.toLowerCase().includes(q),
+  )
 })
 
 onMounted(load)

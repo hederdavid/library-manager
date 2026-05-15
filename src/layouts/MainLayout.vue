@@ -187,10 +187,19 @@
                 <div>
                   <div class="notifications-menu__title">Notificações</div>
                   <div class="notifications-menu__subtitle">
-                    {{ unreadNotificationsCount }} não lida{{ unreadNotificationsCount !== 1 ? 's' : '' }}
+                    {{ unreadNotificationsCount }} não lida{{
+                      unreadNotificationsCount !== 1 ? 's' : ''
+                    }}
                   </div>
                 </div>
-                <q-btn flat round dense icon="done_all" color="primary" aria-label="Marcar todas como lidas" />
+                <q-btn
+                  flat
+                  round
+                  dense
+                  icon="done_all"
+                  color="primary"
+                  aria-label="Marcar todas como lidas"
+                />
               </div>
 
               <q-separator />
@@ -252,10 +261,12 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
+import { useNotify } from 'src/composables/useNotify'
 
 const router = useRouter()
 const route = useRoute()
 const $q = useQuasar()
+const notify = useNotify()
 const leftDrawerOpen = ref($q.screen.gt.sm)
 const pageTitle = computed(() => route.meta.title || 'IFBA')
 const pageSubtitle = computed(() => route.meta.subtitle || '')
@@ -293,11 +304,7 @@ const unreadNotificationsCount = computed(
 )
 
 const logout = () => {
-  $q.notify({
-    message: 'Saindo...',
-    color: 'info',
-    icon: 'info',
-  })
+  notify.info('Saindo...')
   router.push('/entrar')
 }
 </script>

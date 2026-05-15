@@ -11,11 +11,19 @@ async function request(method, path, body) {
 
   if (!response.ok) {
     let message = `Erro ${response.status}: ${response.statusText}`
+    let fieldErrors = {}
     if (response.headers.get('content-type')?.includes('application/json')) {
       const json = await response.json().catch(() => null)
       if (json?.message) message = json.message
+      if (json?.messages) {
+        fieldErrors = json.messages
+        message = Object.values(fieldErrors)[0] || message
+      }
     }
-    throw new Error(message)
+    const error = new Error(message)
+    error.status = response.status
+    error.fieldErrors = fieldErrors
+    throw error
   }
 
   if (response.status === 204) return null
@@ -27,5 +35,6 @@ export default {
   get: (path) => request('GET', path),
   post: (path, data) => request('POST', path, data),
   put: (path, data) => request('PUT', path, data),
+  patch: (path, data) => request('PATCH', path, data),
   delete: (path) => request('DELETE', path),
 }

@@ -83,8 +83,7 @@
         </div>
         <div class="col-12 col-md-6">
           <label class="form-label">
-            <q-icon name="event_available" size="18px" class="q-mr-xs" /> Devolução Prevista
-            *
+            <q-icon name="event_available" size="18px" class="q-mr-xs" /> Devolução Prevista *
           </label>
           <q-input
             v-model="loansStore.form.dueDate"
@@ -130,12 +129,7 @@
       </div>
 
       <div class="form-actions q-mt-xl">
-        <q-btn
-          unelevated
-          color="secondary"
-          class="submit-btn full-width"
-          @click="submitLoan"
-        >
+        <q-btn unelevated color="secondary" class="submit-btn full-width" @click="submitLoan">
           <q-icon name="swap_horiz" class="q-mr-sm" /> Registrar Empréstimo
         </q-btn>
       </div>
@@ -144,18 +138,14 @@
 </template>
 
 <script setup>
-import { useQuasar } from 'quasar'
+import { useNotify } from 'src/composables/useNotify'
 import { useLoansStore } from 'src/stores/loansStore'
 
-const $q = useQuasar()
+const notify = useNotify()
 const loansStore = useLoansStore()
 
 const submitLoan = () => {
-  $q.notify({
-    color: 'positive',
-    message: 'Empréstimo registrado com sucesso!',
-    icon: 'check',
-  })
+  notify.success('Empréstimo registrado com sucesso!')
   loansStore.resetForm()
 }
 </script>

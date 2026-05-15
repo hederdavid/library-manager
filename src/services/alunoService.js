@@ -1,3 +1,5 @@
+import { mockConfig } from './mockConfig'
+
 let alunos = [
   {
     id: 1,
@@ -23,11 +25,17 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, 200))
 
 export default {
   async findAll() {
+    if (!mockConfig.usarMockAlunos) {
+      throw new Error('API de alunos ainda não foi conectada no front.')
+    }
     await wait()
     return [...alunos]
   },
 
   async create(data) {
+    if (!mockConfig.usarMockAlunos) {
+      throw new Error('API de alunos ainda não foi conectada no front.')
+    }
     await wait()
     const aluno = { id: nextId++, ...data }
     alunos = [aluno, ...alunos]
@@ -35,12 +43,18 @@ export default {
   },
 
   async update(id, data) {
+    if (!mockConfig.usarMockAlunos) {
+      throw new Error('API de alunos ainda não foi conectada no front.')
+    }
     await wait()
     alunos = alunos.map((aluno) => (aluno.id === id ? { id, ...data } : aluno))
     return { id, ...data }
   },
 
   async remove(id) {
+    if (!mockConfig.usarMockAlunos) {
+      throw new Error('API de alunos ainda não foi conectada no front.')
+    }
     await wait()
     alunos = alunos.filter((aluno) => aluno.id !== id)
   },

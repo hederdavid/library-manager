@@ -1,8 +1,8 @@
 import { ref } from 'vue'
-import { useQuasar } from 'quasar'
+import { useNotify } from 'src/composables/useNotify'
 
 export function useCrud({ service, emptyForm, validate, messages = {}, loadFn }) {
-  const $q = useQuasar()
+  const notify = useNotify()
 
   const loading = ref(false)
   const saving = ref(false)
@@ -20,7 +20,7 @@ export function useCrud({ service, emptyForm, validate, messages = {}, loadFn })
     try {
       rows.value = await (loadFn ? loadFn() : service.findAll())
     } catch (e) {
-      $q.notify({ type: 'negative', message: e.message, icon: 'error' })
+      notify.error(e, { fallbackMessage: 'Erro ao carregar registros.' })
     } finally {
       loading.value = false
     }
@@ -56,15 +56,18 @@ export function useCrud({ service, emptyForm, validate, messages = {}, loadFn })
     try {
       if (editingId.value) {
         await service.update(editingId.value, form.value)
-        $q.notify({ type: 'positive', message: messages.updated || 'Atualizado com sucesso!', icon: 'check' })
+        notify.success(messages.updated || 'Atualizado com sucesso!')
       } else {
         await service.create(form.value)
-        $q.notify({ type: 'positive', message: messages.created || 'Criado com sucesso!', icon: 'check' })
+        notify.success(messages.created || 'Criado com sucesso!')
       }
       closeDialog()
       await load()
     } catch (e) {
-      $q.notify({ type: 'negative', message: e.message, icon: 'error' })
+      if (e.fieldErrors && Object.keys(e.fieldErrors).length) {
+        errors.value = e.fieldErrors
+      }
+      notify.error(e, { fallbackMessage: 'Erro ao salvar registro.' })
     } finally {
       saving.value = false
     }
@@ -79,11 +82,11 @@ export function useCrud({ service, emptyForm, validate, messages = {}, loadFn })
     deleting.value = true
     try {
       await service.remove(pendingDelete.value.id)
-      $q.notify({ type: 'positive', message: messages.deleted || 'Excluído com sucesso!', icon: 'check' })
+      notify.success(messages.deleted || 'Excluído com sucesso!')
       confirmOpen.value = false
       await load()
     } catch (e) {
-      $q.notify({ type: 'negative', message: e.message, icon: 'error' })
+      notify.error(e, { fallbackMessage: 'Erro ao excluir registro.' })
     } finally {
       deleting.value = false
       pendingDelete.value = null
@@ -91,8 +94,22 @@ export function useCrud({ service, emptyForm, validate, messages = {}, loadFn })
   }
 
   return {
-    loading, saving, deleting,
-    rows, dialogOpen, editingId, errors, form, confirmOpen, pendingDelete,
-    load, openCreate, openEdit, closeDialog, save, confirmDelete, handleDelete,
+    loading,
+    saving,
+    deleting,
+    rows,
+    dialogOpen,
+    editingId,
+    errors,
+    form,
+    confirmOpen,
+    pendingDelete,
+    load,
+    openCreate,
+    openEdit,
+    closeDialog,
+    save,
+    confirmDelete,
+    handleDelete,
   }
 }

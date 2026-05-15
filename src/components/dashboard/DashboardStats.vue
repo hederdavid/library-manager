@@ -3,7 +3,7 @@
     <div class="col-12 col-sm-6 col-md-3">
       <StatCard
         title="Total de Livros"
-        :value="stats?.totalBooks?.value || 14"
+        :value="stats?.totalBooks?.value ?? 14"
         changeText="+3 este mês"
         changeIcon="trending_up"
         description="8 disponíveis"
@@ -15,7 +15,7 @@
     <div class="col-12 col-sm-6 col-md-3">
       <StatCard
         title="Empréstimos Ativos"
-        :value="stats?.activeLoans?.value || 6"
+        :value="stats?.activeLoans?.value ?? 6"
         changeText="+5 esta semana"
         changeIcon="trending_up"
         description="de 12 alunos cadastrados"
@@ -27,7 +27,7 @@
     <div class="col-12 col-sm-6 col-md-3">
       <StatCard
         title="Devoluções Atrasadas"
-        :value="stats?.overdueReturns?.value || 5"
+        :value="stats?.overdueReturns?.value ?? 5"
         changeText="Crítico"
         changeIcon="warning"
         description="requerem atenção imediata"
@@ -39,7 +39,7 @@
     <div class="col-12 col-sm-6 col-md-3">
       <StatCard
         title="Alunos c/ Pendência"
-        :value="stats?.pendingStudents?.value || 5"
+        :value="stats?.pendingStudents?.value ?? 5"
         changeText="Verificar"
         changeIcon="warning"
         description="de 12 alunos"
@@ -54,6 +54,6 @@
 import StatCard from 'src/components/StatCard.vue'
 
 defineProps({
-  stats: Object
+  stats: Object,
 })
 </script>

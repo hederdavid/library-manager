@@ -6,57 +6,18 @@
       </q-btn>
     </div>
 
-    <div class="lib-card">
-      <div class="table-toolbar q-px-lg q-py-md">
-        <div class="table-toolbar__main-row">
-          <div>
-            <h2 class="text-h6 text-weight-bold text-main q-ma-none">Lista de Matérias</h2>
-            <p class="text-caption text-muted q-mt-xs q-mb-none">
-              {{ rows.length }} matéria{{ rows.length !== 1 ? 's' : '' }} cadastrada{{ rows.length !== 1 ? 's' : '' }}
-            </p>
-          </div>
-          <q-input
-            v-model="filter"
-            outlined
-            dense
-            placeholder="Buscar matérias..."
-            class="table-search-input bg-white"
-            rounded
-          >
-            <template v-slot:prepend>
-              <q-icon name="search" size="20px" color="grey-5" />
-            </template>
-          </q-input>
-        </div>
-      </div>
-
-      <q-separator />
-
-      <q-table
-        flat
-        :rows="filteredRows"
-        :columns="columns"
-        row-key="id"
-        :loading="loading"
-        class="lib-table"
-        :pagination="{ rowsPerPage: 10 }"
-        no-data-label="Nenhuma matéria cadastrada"
-      >
-        <template v-slot:body-cell-actions="props">
-          <q-td :props="props">
-            <q-btn flat dense round icon="edit" color="primary" size="sm" @click="openEdit(props.row)">
-              <q-tooltip>Editar</q-tooltip>
-            </q-btn>
-            <q-btn flat dense round icon="delete_outline" color="negative" size="sm" class="q-ml-xs" @click="confirmDelete(props.row)">
-              <q-tooltip>Excluir</q-tooltip>
-            </q-btn>
-          </q-td>
-        </template>
-        <template v-slot:loading>
-          <q-inner-loading showing color="primary" />
-        </template>
-      </q-table>
-    </div>
+    <BaseDataTable
+      v-model:filter="filter"
+      title="Lista de Matérias"
+      :subtitle="`${rows.length} matéria${rows.length !== 1 ? 's' : ''} cadastrada${rows.length !== 1 ? 's' : ''}`"
+      :rows="filteredRows"
+      :columns="columns"
+      :loading="loading"
+      search-placeholder="Buscar matérias..."
+      empty-label="Nenhuma matéria cadastrada"
+      @edit="openEdit"
+      @delete="confirmDelete"
+    />
 
     <CursoFormDialog
       v-model="dialogOpen"
@@ -71,7 +32,9 @@
     <ConfirmDialog
       v-model="confirmOpen"
       title="Excluir Matéria"
-      :message="`Deseja excluir a matéria <strong>${pendingDelete?.nome_curso}</strong>? Esta ação não pode ser desfeita.`"
+      message="Deseja excluir a matéria "
+      :highlight="pendingDelete?.nomeCurso"
+      details="? Esta ação não pode ser desfeita."
       icon="delete_outline"
       icon-theme="red"
       confirm-label="Excluir"
@@ -83,6 +46,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import BaseDataTable from 'src/components/base/BaseDataTable.vue'
 import ConfirmDialog from 'src/components/ConfirmDialog.vue'
 import CursoFormDialog from 'src/components/crud/CursoFormDialog.vue'
 import { useCrud } from 'src/composables/useCrud'
@@ -91,14 +55,29 @@ import cursoService from 'src/services/cursoService'
 const filter = ref('')
 
 const {
-  loading, saving, deleting, rows, dialogOpen, editingId, errors, form,
-  confirmOpen, pendingDelete, load, openCreate, openEdit, closeDialog, save, confirmDelete, handleDelete,
+  loading,
+  saving,
+  deleting,
+  rows,
+  dialogOpen,
+  editingId,
+  errors,
+  form,
+  confirmOpen,
+  pendingDelete,
+  load,
+  openCreate,
+  openEdit,
+  closeDialog,
+  save,
+  confirmDelete,
+  handleDelete,
 } = useCrud({
   service: cursoService,
-  emptyForm: () => ({ nome_curso: '' }),
+  emptyForm: () => ({ nomeCurso: '' }),
   validate: (f) => {
     const e = {}
-    if (!f.nome_curso?.trim()) e.nome_curso = 'Nome é obrigatório'
+    if (!f.nomeCurso?.trim()) e.nomeCurso = 'Nome é obrigatório'
     return e
   },
   messages: {
@@ -110,14 +89,20 @@ const {
 
 const columns = [
   { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
-  { name: 'nome_curso', label: 'NOME DA MATÉRIA', field: 'nome_curso', align: 'left', sortable: true },
+  {
+    name: 'nomeCurso',
+    label: 'NOME DA MATÉRIA',
+    field: 'nomeCurso',
+    align: 'left',
+    sortable: true,
+  },
   { name: 'actions', label: 'AÇÕES', field: 'actions', align: 'center', sortable: false },
 ]
 
 const filteredRows = computed(() => {
   if (!filter.value.trim()) return rows.value
   const q = filter.value.toLowerCase()
-  return rows.value.filter((r) => r.nome_curso?.toLowerCase().includes(q))
+  return rows.value.filter((r) => r.nomeCurso?.toLowerCase().includes(q))
 })
 
 onMounted(load)
