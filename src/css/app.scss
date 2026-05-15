@@ -21,6 +21,35 @@
   font-weight: 600;
 }
 
+.table-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.table-page-actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.table-toolbar__main-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.table-search-input {
+  width: min(280px, 100%);
+
+  .q-field__control {
+    border-radius: 20px;
+    height: 40px;
+  }
+}
+
 .lib-table {
   thead tr th {
     font-weight: 700;
@@ -35,6 +64,56 @@
     padding: 16px;
     font-size: 14px;
     color: $text-main;
+  }
+}
+
+.status-pill {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+
+  &--ativo {
+    color: $tag-green-text;
+    background: $tag-green-bg;
+  }
+
+  &--pendente {
+    color: $badge-orange-text;
+    background: $badge-orange-bg;
+  }
+
+  &--inativo {
+    color: $text-muted;
+    background: $bg-input;
+  }
+}
+
+.condition-tag {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+
+  &--novo {
+    color: $tag-green-text;
+    background: $tag-green-bg;
+  }
+
+  &--bom {
+    color: $tag-blue-text;
+    background: $tag-blue-bg;
+  }
+
+  &--regular {
+    color: $badge-orange-text;
+    background: $badge-orange-bg;
+  }
+
+  &--ruim {
+    color: $tag-red-text;
+    background: $tag-red-bg;
   }
 }
 
@@ -54,4 +133,21 @@
 .lib-form-field .q-field__control {
   border-radius: 10px;
   background: $bg-input;
+}
+
+@media (max-width: 700px) {
+  .q-page.q-px-xl {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+
+  .table-toolbar__main-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .table-search-input,
+  .table-page-actions .q-btn {
+    width: 100%;
+  }
 }
