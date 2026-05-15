@@ -40,12 +40,18 @@
       </div>
       <div class="col-12 col-sm-6">
         <label class="lib-form-label">Turma</label>
-        <q-input
-          :model-value="form.turma"
-          @update:model-value="$emit('update:form', { ...form, turma: $event })"
+        <q-select
+          :model-value="form.idTurma"
+          @update:model-value="$emit('update:form', { ...form, idTurma: $event })"
+          :options="turmaOptions"
+          option-value="value"
+          option-label="label"
+          emit-value
+          map-options
+          clearable
           outlined
           dense
-          placeholder="Ex: 1A - 2024"
+          placeholder="Selecione a turma"
           class="lib-form-field"
         />
       </div>
@@ -64,17 +70,6 @@
           class="lib-form-field"
         />
       </div>
-      <div class="col-12 col-sm-4">
-        <label class="lib-form-label">Status</label>
-        <q-select
-          :model-value="form.status"
-          @update:model-value="$emit('update:form', { ...form, status: $event })"
-          :options="['Ativo', 'Pendente', 'Inativo']"
-          outlined
-          dense
-          class="lib-form-field"
-        />
-      </div>
     </div>
   </BaseFormDialog>
 </template>
@@ -88,6 +83,7 @@ defineProps({
   form: Object,
   errors: Object,
   saving: Boolean,
+  turmaOptions: { type: Array, default: () => [] },
 })
 
 defineEmits(['update:modelValue', 'update:form', 'close', 'save'])

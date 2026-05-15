@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseDataTable from 'src/components/base/BaseDataTable.vue'
 import ConfirmDialog from 'src/components/ConfirmDialog.vue'
 import CursoFormDialog from 'src/components/crud/CursoFormDialog.vue'
@@ -53,6 +53,7 @@ import { useCrud } from 'src/composables/useCrud'
 import cursoService from 'src/services/cursoService'
 
 const filter = ref('')
+let filtroTimeout = null
 
 const {
   loading,
@@ -85,6 +86,10 @@ const {
     updated: 'Matéria atualizada com sucesso!',
     deleted: 'Matéria excluída com sucesso!',
   },
+  loadFn: () =>
+    cursoService.findAll({
+      nomeCurso: filter.value,
+    }),
 })
 
 const columns = [
@@ -99,10 +104,11 @@ const columns = [
   { name: 'actions', label: 'AÇÕES', field: 'actions', align: 'center', sortable: false },
 ]
 
-const filteredRows = computed(() => {
-  if (!filter.value.trim()) return rows.value
-  const q = filter.value.toLowerCase()
-  return rows.value.filter((r) => r.nomeCurso?.toLowerCase().includes(q))
+const filteredRows = computed(() => rows.value)
+
+watch(filter, () => {
+  clearTimeout(filtroTimeout)
+  filtroTimeout = setTimeout(load, 350)
 })
 
 onMounted(load)

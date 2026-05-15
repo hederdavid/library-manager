@@ -26,65 +26,45 @@
 
     <div class="row q-col-gutter-md q-mb-md">
       <div class="col-12 col-sm-6">
-        <label class="lib-form-label">Código *</label>
+        <label class="lib-form-label">Disciplina *</label>
         <q-input
-          :model-value="form.codigo"
-          @update:model-value="$emit('update:form', { ...form, codigo: $event })"
-          outlined
-          dense
-          placeholder="Ex: INF-001"
-          class="lib-form-field"
-          :error="!!errors.codigo"
-          :error-message="errors.codigo"
-        />
-      </div>
-      <div class="col-12 col-sm-6">
-        <label class="lib-form-label">Autor</label>
-        <q-input
-          :model-value="form.autor"
-          @update:model-value="$emit('update:form', { ...form, autor: $event })"
-          outlined
-          dense
-          placeholder="Ex: Thomas H. Cormen"
-          class="lib-form-field"
-        />
-      </div>
-    </div>
-
-    <div class="row q-col-gutter-md">
-      <div class="col-12 col-sm-4">
-        <label class="lib-form-label">Categoria</label>
-        <q-input
-          :model-value="form.categoria"
-          @update:model-value="$emit('update:form', { ...form, categoria: $event })"
+          :model-value="form.disciplina"
+          @update:model-value="$emit('update:form', { ...form, disciplina: $event })"
           outlined
           dense
           placeholder="Ex: Informática"
           class="lib-form-field"
+          :error="!!errors.disciplina"
+          :error-message="errors.disciplina"
         />
       </div>
-      <div class="col-12 col-sm-4">
-        <label class="lib-form-label">Condição</label>
-        <q-select
-          :model-value="form.condicao"
-          @update:model-value="$emit('update:form', { ...form, condicao: $event })"
-          :options="['Novo', 'Bom', 'Regular', 'Ruim']"
+      <div class="col-12 col-sm-6">
+        <label class="lib-form-label">Ano Escolar *</label>
+        <q-input
+          :model-value="form.anoEscolar"
+          @update:model-value="$emit('update:form', { ...form, anoEscolar: $event })"
           outlined
           dense
+          placeholder="Ex: 1º ano"
           class="lib-form-field"
+          :error="!!errors.anoEscolar"
+          :error-message="errors.anoEscolar"
         />
       </div>
-      <div class="col-12 col-sm-4">
-        <label class="lib-form-label">Status</label>
-        <q-select
-          :model-value="form.status"
-          @update:model-value="$emit('update:form', { ...form, status: $event })"
-          :options="['Disponível', 'Emprestado', 'Reservado']"
-          outlined
-          dense
-          class="lib-form-field"
-        />
-      </div>
+    </div>
+
+    <div>
+      <label class="lib-form-label">Edição *</label>
+      <q-input
+        :model-value="form.edicao"
+        @update:model-value="$emit('update:form', { ...form, edicao: $event })"
+        outlined
+        dense
+        placeholder="Ex: 3ª edição"
+        class="lib-form-field"
+        :error="!!errors.edicao"
+        :error-message="errors.edicao"
+      />
     </div>
   </BaseFormDialog>
 </template>

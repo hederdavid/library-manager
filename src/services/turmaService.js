@@ -18,8 +18,8 @@ function toDto(data) {
 }
 
 export default {
-  findAll: async () => {
-    const turmas = await http.get('/turma')
+  findAll: async (filters = {}) => {
+    const turmas = await http.get('/turma', filters)
     return turmas.map(normalizarTurma)
   },
   findById: async (id) => normalizarTurma(await http.get(`/turma/${id}`)),

@@ -1,9 +1,6 @@
 <template>
   <q-page padding class="q-px-xl q-pb-xl q-pt-lg dashboard-page">
-    <div
-      v-if="loading"
-      class="row q-col-gutter-lg justify-center items-center dashboard-loading"
-    >
+    <div v-if="loading" class="row q-col-gutter-lg justify-center items-center dashboard-loading">
       <q-spinner-dots color="primary" size="3rem" />
     </div>
 

@@ -24,8 +24,10 @@ export const useLoansStore = defineStore('loans', () => {
   ])
 
   const historyColumns = [
+    { name: 'id', align: 'left', label: 'ID', field: 'id', sortable: true },
     { name: 'student', align: 'left', label: 'ALUNO', field: 'studentName' },
     { name: 'book', align: 'left', label: 'LIVRO', field: 'bookTitle' },
+    { name: 'bookCode', align: 'left', label: 'CÓDIGO', field: 'bookCode' },
     { name: 'outDate', align: 'left', label: 'SAÍDA', field: 'outDate' },
     { name: 'dueDate', align: 'left', label: 'PREV. DEVOLUÇÃO', field: 'dueDate' },
     { name: 'returnDate', align: 'left', label: 'DEVOLUÇÃO REAL', field: 'returnDate' },
@@ -52,7 +54,7 @@ export const useLoansStore = defineStore('loans', () => {
       id: 2,
       studentName: 'João Pedro Silva',
       studentId: '20240001',
-      bookTitle: 'Programação Orientada a...',
+      bookTitle: 'Programação Orientada a Objetos',
       bookCode: 'INF-013',
       outDate: '01/03/2026',
       dueDate: '01/04/2026',
@@ -72,13 +74,13 @@ export const useLoansStore = defineStore('loans', () => {
       returnDate: '22/03/2026',
       condition: 'Novo',
       status: 'Devolvido',
-      obs: 'Devolvido com 2 dias d...',
+      obs: 'Devolvido com 2 dias de atraso',
     },
     {
       id: 4,
       studentName: 'Ana Luíza Costa',
       studentId: '20240004',
-      bookTitle: 'Fundamentos de Física V...',
+      bookTitle: 'Fundamentos de Física Volume 1',
       bookCode: 'FIS-001',
       outDate: '15/02/2026',
       dueDate: '15/03/2026',

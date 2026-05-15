@@ -17,7 +17,18 @@
       empty-label="Nenhum campus cadastrado"
       @edit="openEdit"
       @delete="confirmDelete"
-    />
+    >
+      <template v-slot:filters>
+        <q-input
+          v-model="filtros.cidade"
+          outlined
+          dense
+          clearable
+          label="Cidade"
+          class="table-filter-field bg-white"
+        />
+      </template>
+    </BaseDataTable>
 
     <CampusFormDialog
       v-model="dialogOpen"
@@ -45,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseDataTable from 'src/components/base/BaseDataTable.vue'
 import ConfirmDialog from 'src/components/ConfirmDialog.vue'
 import CampusFormDialog from 'src/components/crud/CampusFormDialog.vue'
@@ -53,6 +64,10 @@ import { useCrud } from 'src/composables/useCrud'
 import campusService from 'src/services/campusService'
 
 const filter = ref('')
+const filtros = ref({
+  cidade: '',
+})
+let filtroTimeout = null
 
 const {
   loading,
@@ -86,6 +101,11 @@ const {
     updated: 'Campus atualizado com sucesso!',
     deleted: 'Campus excluído com sucesso!',
   },
+  loadFn: () =>
+    campusService.findAll({
+      nome: filter.value,
+      cidade: filtros.value.cidade,
+    }),
 })
 
 const columns = [
@@ -95,13 +115,16 @@ const columns = [
   { name: 'actions', label: 'AÇÕES', field: 'actions', align: 'center', sortable: false },
 ]
 
-const filteredRows = computed(() => {
-  if (!filter.value.trim()) return rows.value
-  const q = filter.value.toLowerCase()
-  return rows.value.filter(
-    (r) => r.nome?.toLowerCase().includes(q) || r.cidade?.toLowerCase().includes(q),
-  )
-})
+const filteredRows = computed(() => rows.value)
+
+watch(
+  [filter, filtros],
+  () => {
+    clearTimeout(filtroTimeout)
+    filtroTimeout = setTimeout(load, 350)
+  },
+  { deep: true },
+)
 
 onMounted(load)
 </script>

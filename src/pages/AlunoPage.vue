@@ -6,11 +6,6 @@
       </q-btn>
     </div>
 
-    <MockDataBanner
-      :show="mockConfig.usarMockAlunos"
-      message="Dados demonstrativos: o backend ainda não possui API completa de alunos."
-    />
-
     <BaseDataTable
       v-model:filter="filter"
       title="Lista de Alunos"
@@ -23,18 +18,52 @@
       @edit="openEdit"
       @delete="confirmDelete"
     >
+      <template v-slot:filters>
+        <q-input
+          v-model="filtros.email"
+          outlined
+          dense
+          clearable
+          label="E-mail"
+          class="table-filter-field bg-white"
+        />
+        <q-input
+          v-model="filtros.matricula"
+          outlined
+          dense
+          clearable
+          label="Matrícula"
+          class="table-filter-field bg-white"
+        />
+        <q-select
+          v-model="filtros.turmaId"
+          :options="turmaOptions"
+          outlined
+          dense
+          clearable
+          emit-value
+          map-options
+          label="Turma"
+          class="table-filter-field bg-white"
+        />
+      </template>
+
       <template v-slot:body-cell-student="props">
         <q-td :props="props">
           <div class="text-weight-bold text-main">{{ props.row.nome }}</div>
-          <div class="text-caption text-muted">{{ props.row.email || 'E-mail não informado' }}</div>
         </q-td>
       </template>
 
-      <template v-slot:body-cell-status="props">
+      <template v-slot:body-cell-email="props">
         <q-td :props="props">
-          <q-badge class="status-pill" :class="`status-pill--${props.value.toLowerCase()}`">
-            {{ props.value }}
-          </q-badge>
+          <span class="student-email">{{ props.row.email || 'E-mail não informado' }}</span>
+        </q-td>
+      </template>
+
+      <template v-slot:body-cell-turma="props">
+        <q-td :props="props">
+          <div class="text-weight-bold text-main">{{ turmaPrimaryLabel(props.row.turma) }}</div>
+          <div class="text-caption text-muted">{{ turmaSecondaryLabel(props.row.turma) }}</div>
         </q-td>
       </template>
     </BaseDataTable>
@@ -45,6 +74,7 @@
       v-model:form="form"
       :errors="errors"
       :saving="saving"
+      :turma-options="turmaOptions"
       @close="closeDialog"
       @save="save"
     />
@@ -65,16 +95,22 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseDataTable from 'src/components/base/BaseDataTable.vue'
-import MockDataBanner from 'src/components/base/MockDataBanner.vue'
 import AlunoFormDialog from 'src/components/crud/AlunoFormDialog.vue'
 import ConfirmDialog from 'src/components/ConfirmDialog.vue'
 import { useCrud } from 'src/composables/useCrud'
 import alunoService from 'src/services/alunoService'
-import { mockConfig } from 'src/services/mockConfig'
+import turmaService from 'src/services/turmaService'
 
 const filter = ref('')
+const filtros = ref({
+  email: '',
+  matricula: '',
+  turmaId: null,
+})
+const turmas = ref([])
+let filtroTimeout = null
 
 const {
   loading,
@@ -96,7 +132,7 @@ const {
   handleDelete,
 } = useCrud({
   service: alunoService,
-  emptyForm: () => ({ nome: '', matricula: '', turma: '', email: '', status: 'Ativo' }),
+  emptyForm: () => ({ nome: '', matricula: '', idTurma: null, email: '' }),
   validate: (f) => {
     const e = {}
     if (!f.nome?.trim()) e.nome = 'Nome é obrigatório'
@@ -108,29 +144,71 @@ const {
     updated: 'Aluno atualizado com sucesso!',
     deleted: 'Aluno excluído com sucesso!',
   },
+  loadFn: () =>
+    alunoService.findAll({
+      nome: filter.value,
+      email: filtros.value.email,
+      matricula: filtros.value.matricula,
+      turmaId: filtros.value.turmaId,
+    }),
 })
 
 const columns = [
   { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
   { name: 'student', label: 'ALUNO', field: 'nome', align: 'left', sortable: true },
+  { name: 'email', label: 'E-MAIL', field: 'email', align: 'left', sortable: true },
   { name: 'matricula', label: 'MATRÍCULA', field: 'matricula', align: 'left', sortable: true },
   { name: 'turma', label: 'TURMA', field: 'turma', align: 'left', sortable: true },
-  { name: 'status', label: 'STATUS', field: 'status', align: 'left', sortable: true },
   { name: 'actions', label: 'AÇÕES', field: 'actions', align: 'center', sortable: false },
 ]
 
-const filteredRows = computed(() => {
-  if (!filter.value.trim()) return rows.value
-  const q = filter.value.toLowerCase()
-  return rows.value.filter(
-    (r) =>
-      r.nome?.toLowerCase().includes(q) ||
-      r.matricula?.toLowerCase().includes(q) ||
-      r.turma?.toLowerCase().includes(q) ||
-      r.email?.toLowerCase().includes(q) ||
-      r.status?.toLowerCase().includes(q),
-  )
-})
+const filteredRows = computed(() => rows.value)
+const turmaOptions = computed(() =>
+  turmas.value.map((turma) => ({ label: turmaLabel(turma), value: turma.id })),
+)
 
-onMounted(load)
+function turmaLabel(turma) {
+  if (!turma) return 'Sem turma'
+  const curso = turma.curso?.nomeCurso ? ` - ${turma.curso.nomeCurso}` : ''
+  return `${turma.serie} (${turma.anoLetivo})${curso}`
+}
+
+function turmaPrimaryLabel(turma) {
+  if (!turma) return 'Sem turma'
+  return `${turma.serie} (${turma.anoLetivo})`
+}
+
+function turmaSecondaryLabel(turma) {
+  if (!turma) return 'Vínculo não informado'
+  const curso = turma.curso?.nomeCurso || 'Matéria não informada'
+  const campus = turma.campus
+    ? `${turma.campus.nome} - ${turma.campus.cidade}`
+    : 'Campus não informado'
+  return `${curso} | ${campus}`
+}
+
+async function carregarTurmas() {
+  turmas.value = await turmaService.findAll()
+}
+
+watch(
+  [filter, filtros],
+  () => {
+    clearTimeout(filtroTimeout)
+    filtroTimeout = setTimeout(load, 350)
+  },
+  { deep: true },
+)
+
+onMounted(async () => {
+  await carregarTurmas()
+  await load()
+})
 </script>
+
+<style lang="scss" scoped>
+.student-email {
+  color: $text-main;
+  word-break: break-word;
+}
+</style>

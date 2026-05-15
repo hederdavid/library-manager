@@ -22,6 +22,10 @@
           </template>
         </q-input>
       </div>
+
+      <div v-if="$slots.filters" class="table-toolbar__filters">
+        <slot name="filters" />
+      </div>
     </div>
 
     <q-separator />
@@ -36,7 +40,7 @@
       :pagination="pagination"
       :no-data-label="emptyLabel"
     >
-      <template v-for="(_, slotName) in $slots" #[slotName]="slotProps">
+      <template v-for="slotName in forwardedSlotNames" #[slotName]="slotProps">
         <slot :name="slotName" v-bind="slotProps" />
       </template>
 
@@ -83,6 +87,8 @@
 </template>
 
 <script setup>
+import { computed, useSlots } from 'vue'
+
 defineProps({
   title: { type: String, required: true },
   subtitle: { type: String, default: '' },
@@ -98,4 +104,9 @@ defineProps({
 })
 
 defineEmits(['update:filter', 'edit', 'delete'])
+
+const slots = useSlots()
+const forwardedSlotNames = computed(() =>
+  Object.keys(slots).filter((slotName) => slotName !== 'filters'),
+)
 </script>

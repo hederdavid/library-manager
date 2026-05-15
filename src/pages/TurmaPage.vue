@@ -30,21 +30,63 @@
       @edit="openEdit"
       @delete="confirmDelete"
     >
+      <template v-slot:filters>
+        <q-input
+          v-model.number="filtros.anoLetivo"
+          outlined
+          dense
+          clearable
+          type="number"
+          label="Ano letivo"
+          class="table-filter-field bg-white"
+        />
+        <q-input
+          v-model="filtros.curso"
+          outlined
+          dense
+          clearable
+          label="Matéria"
+          class="table-filter-field bg-white"
+        />
+        <q-input
+          v-model="filtros.campus"
+          outlined
+          dense
+          clearable
+          label="Campus"
+          class="table-filter-field bg-white"
+        />
+      </template>
+
       <template v-slot:body-cell-curso="props">
         <q-td :props="props">
-          <span class="course-badge">{{
-            props.row.curso?.nomeCurso || cursosMap[props.row.idCurso] || `ID ${props.row.idCurso}`
-          }}</span>
+          <div class="text-weight-bold text-main">
+            {{
+              props.row.curso?.nomeCurso || cursosMap[props.row.idCurso] || 'Matéria não informada'
+            }}
+          </div>
+          <div class="text-caption text-muted">
+            ID {{ props.row.curso?.id || props.row.idCurso || 'não informado' }}
+          </div>
         </q-td>
       </template>
 
       <template v-slot:body-cell-campus="props">
         <q-td :props="props">
-          {{
-            props.row.campus
-              ? `${props.row.campus.nome} — ${props.row.campus.cidade}`
-              : campusMap[props.row.idCampus] || `ID ${props.row.idCampus}`
-          }}
+          <div class="text-weight-bold text-main">
+            {{
+              props.row.campus?.nome ||
+              campusMap[props.row.idCampus]?.nome ||
+              'Campus não informado'
+            }}
+          </div>
+          <div class="text-caption text-muted">
+            {{
+              props.row.campus?.cidade ||
+              campusMap[props.row.idCampus]?.cidade ||
+              'Cidade não informada'
+            }}
+          </div>
         </q-td>
       </template>
     </BaseDataTable>
@@ -77,7 +119,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseDataTable from 'src/components/base/BaseDataTable.vue'
 import StatCardMini from 'src/components/StatCardMini.vue'
 import ConfirmDialog from 'src/components/ConfirmDialog.vue'
@@ -88,8 +130,14 @@ import campusService from 'src/services/campusService'
 import cursoService from 'src/services/cursoService'
 
 const filter = ref('')
+const filtros = ref({
+  anoLetivo: null,
+  curso: '',
+  campus: '',
+})
 const campus = ref([])
 const cursos = ref([])
+let filtroTimeout = null
 
 const {
   loading,
@@ -132,7 +180,12 @@ const {
   },
   loadFn: async () => {
     const [turmas, campusList, cursosList] = await Promise.all([
-      turmaService.findAll(),
+      turmaService.findAll({
+        serie: filter.value,
+        anoLetivo: filtros.value.anoLetivo,
+        curso: filtros.value.curso,
+        campus: filtros.value.campus,
+      }),
       campusService.findAll(),
       cursoService.findAll(),
     ])
@@ -153,35 +206,23 @@ const columns = [
 
 const cursosMap = computed(() => Object.fromEntries(cursos.value.map((c) => [c.id, c.nomeCurso])))
 const campusMap = computed(() =>
-  Object.fromEntries(campus.value.map((c) => [c.id, `${c.nome} — ${c.cidade}`])),
+  Object.fromEntries(campus.value.map((c) => [c.id, { nome: c.nome, cidade: c.cidade }])),
 )
 const cursoOptions = computed(() => cursos.value.map((c) => ({ label: c.nomeCurso, value: c.id })))
 const campusOptions = computed(() =>
   campus.value.map((c) => ({ label: `${c.nome} — ${c.cidade}`, value: c.id })),
 )
 
-const filteredRows = computed(() => {
-  if (!filter.value.trim()) return rows.value
-  const q = filter.value.toLowerCase()
-  return rows.value.filter(
-    (r) =>
-      String(r.anoLetivo).includes(q) ||
-      r.serie?.toLowerCase().includes(q) ||
-      cursosMap.value[r.idCurso]?.toLowerCase().includes(q) ||
-      campusMap.value[r.idCampus]?.toLowerCase().includes(q),
-  )
-})
+const filteredRows = computed(() => rows.value)
+
+watch(
+  [filter, filtros],
+  () => {
+    clearTimeout(filtroTimeout)
+    filtroTimeout = setTimeout(load, 350)
+  },
+  { deep: true },
+)
 
 onMounted(load)
 </script>
-
-<style lang="scss" scoped>
-.course-badge {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 6px;
-  background: $tag-blue-bg;
-  color: $tag-blue-text;
-}
-</style>

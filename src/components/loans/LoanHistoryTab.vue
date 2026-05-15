@@ -76,7 +76,6 @@
       <template v-slot:body-cell-book="props">
         <q-td :props="props">
           <div class="text-weight-bold text-main">{{ props.row.bookTitle }}</div>
-          <div class="text-caption text-muted">{{ props.row.bookCode }}</div>
         </q-td>
       </template>
     </q-table>

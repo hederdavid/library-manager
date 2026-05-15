@@ -45,6 +45,18 @@
   width: 100%;
 }
 
+.table-toolbar__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.table-filter-field {
+  min-width: 180px;
+  max-width: 240px;
+}
+
 .table-search-input {
   width: min(280px, 100%);
 
@@ -150,8 +162,14 @@
     flex-direction: column;
   }
 
+  .table-toolbar__filters {
+    flex-direction: column;
+  }
+
+  .table-filter-field,
   .table-search-input,
   .table-page-actions .q-btn {
     width: 100%;
+    max-width: none;
   }
 }

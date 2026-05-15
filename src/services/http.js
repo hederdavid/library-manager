@@ -1,5 +1,19 @@
 const BASE_URL = '/api'
 
+function buildQuery(params) {
+  if (!params) return ''
+
+  const searchParams = new URLSearchParams()
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      searchParams.append(key, value)
+    }
+  })
+
+  const query = searchParams.toString()
+  return query ? `?${query}` : ''
+}
+
 async function request(method, path, body) {
   const options = {
     method,
@@ -32,7 +46,7 @@ async function request(method, path, body) {
 }
 
 export default {
-  get: (path) => request('GET', path),
+  get: (path, params) => request('GET', `${path}${buildQuery(params)}`),
   post: (path, data) => request('POST', path, data),
   put: (path, data) => request('PUT', path, data),
   patch: (path, data) => request('PATCH', path, data),

@@ -1,61 +1,39 @@
-import { mockConfig } from './mockConfig'
+import http from './http'
 
-let alunos = [
-  {
-    id: 1,
-    nome: 'Maria Fernanda Santos',
-    matricula: '2024001',
-    turma: '1A - 2024',
-    email: 'maria.santos@ifba.edu.br',
-    status: 'Ativo',
-  },
-  {
-    id: 2,
-    nome: 'João Pedro Silva',
-    matricula: '2024002',
-    turma: '2B - 2024',
-    email: 'joao.silva@ifba.edu.br',
-    status: 'Pendente',
-  },
-]
+function normalizarAluno(aluno) {
+  return {
+    ...aluno,
+    idTurma: aluno.idTurma ?? aluno.turma?.id ?? null,
+  }
+}
 
-let nextId = 3
-
-const wait = () => new Promise((resolve) => setTimeout(resolve, 200))
+function toPayload(data) {
+  return {
+    matricula: data.matricula,
+    nome: data.nome,
+    email: data.email || null,
+    fotoPerfil: data.fotoPerfil || null,
+    turma: data.idTurma ? { id: data.idTurma } : null,
+  }
+}
 
 export default {
-  async findAll() {
-    if (!mockConfig.usarMockAlunos) {
-      throw new Error('API de alunos ainda não foi conectada no front.')
-    }
-    await wait()
-    return [...alunos]
+  async findAll(filters = {}) {
+    const alunos = await http.get('/alunos', filters)
+    return alunos.map(normalizarAluno)
+  },
+
+  async findById(id) {
+    return normalizarAluno(await http.get(`/alunos/${id}`))
   },
 
   async create(data) {
-    if (!mockConfig.usarMockAlunos) {
-      throw new Error('API de alunos ainda não foi conectada no front.')
-    }
-    await wait()
-    const aluno = { id: nextId++, ...data }
-    alunos = [aluno, ...alunos]
-    return aluno
+    return normalizarAluno(await http.post('/alunos', toPayload(data)))
   },
 
   async update(id, data) {
-    if (!mockConfig.usarMockAlunos) {
-      throw new Error('API de alunos ainda não foi conectada no front.')
-    }
-    await wait()
-    alunos = alunos.map((aluno) => (aluno.id === id ? { id, ...data } : aluno))
-    return { id, ...data }
+    return normalizarAluno(await http.patch(`/alunos/${id}`, toPayload(data)))
   },
 
-  async remove(id) {
-    if (!mockConfig.usarMockAlunos) {
-      throw new Error('API de alunos ainda não foi conectada no front.')
-    }
-    await wait()
-    alunos = alunos.filter((aluno) => aluno.id !== id)
-  },
+  remove: (id) => http.delete(`/alunos/${id}`),
 }

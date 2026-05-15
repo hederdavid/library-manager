@@ -6,11 +6,6 @@
       </q-btn>
     </div>
 
-    <MockDataBanner
-      :show="mockConfig.usarMockLivros"
-      message="Dados demonstrativos: o backend ainda não possui API completa de livros."
-    />
-
     <BaseDataTable
       v-model:filter="filter"
       title="Lista de Livros"
@@ -23,26 +18,42 @@
       @edit="openEdit"
       @delete="confirmDelete"
     >
+      <template v-slot:filters>
+        <q-input
+          v-model="filtros.disciplina"
+          outlined
+          dense
+          clearable
+          label="Disciplina"
+          class="table-filter-field bg-white"
+        />
+        <q-input
+          v-model="filtros.anoEscolar"
+          outlined
+          dense
+          clearable
+          label="Ano escolar"
+          class="table-filter-field bg-white"
+        />
+        <q-input
+          v-model="filtros.edicao"
+          outlined
+          dense
+          clearable
+          label="Edição"
+          class="table-filter-field bg-white"
+        />
+      </template>
+
       <template v-slot:body-cell-book="props">
         <q-td :props="props">
           <div class="text-weight-bold text-main">{{ props.row.titulo }}</div>
-          <div class="text-caption text-muted">{{ props.row.autor || 'Autor não informado' }}</div>
         </q-td>
       </template>
 
-      <template v-slot:body-cell-condicao="props">
+      <template v-slot:body-cell-disciplina="props">
         <q-td :props="props">
-          <span class="condition-tag" :class="`condition-tag--${props.value.toLowerCase()}`">
-            {{ props.value }}
-          </span>
-        </q-td>
-      </template>
-
-      <template v-slot:body-cell-status="props">
-        <q-td :props="props">
-          <q-badge class="status-pill" :class="`status-pill--${statusClass(props.value)}`">
-            {{ props.value }}
-          </q-badge>
+          <span class="book-subject">{{ props.row.disciplina }}</span>
         </q-td>
       </template>
     </BaseDataTable>
@@ -73,16 +84,20 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseDataTable from 'src/components/base/BaseDataTable.vue'
-import MockDataBanner from 'src/components/base/MockDataBanner.vue'
 import ConfirmDialog from 'src/components/ConfirmDialog.vue'
 import LivroFormDialog from 'src/components/crud/LivroFormDialog.vue'
 import { useCrud } from 'src/composables/useCrud'
 import livroService from 'src/services/livroService'
-import { mockConfig } from 'src/services/mockConfig'
 
 const filter = ref('')
+const filtros = ref({
+  disciplina: '',
+  anoEscolar: '',
+  edicao: '',
+})
+let filtroTimeout = null
 
 const {
   loading,
@@ -106,16 +121,16 @@ const {
   service: livroService,
   emptyForm: () => ({
     titulo: '',
-    codigo: '',
-    autor: '',
-    categoria: '',
-    condicao: 'Bom',
-    status: 'Disponível',
+    disciplina: '',
+    anoEscolar: '',
+    edicao: '',
   }),
   validate: (f) => {
     const e = {}
     if (!f.titulo?.trim()) e.titulo = 'Título é obrigatório'
-    if (!f.codigo?.trim()) e.codigo = 'Código é obrigatório'
+    if (!f.disciplina?.trim()) e.disciplina = 'Disciplina é obrigatória'
+    if (!f.anoEscolar?.trim()) e.anoEscolar = 'Ano escolar é obrigatório'
+    if (!f.edicao?.trim()) e.edicao = 'Edição é obrigatória'
     return e
   },
   messages: {
@@ -123,37 +138,48 @@ const {
     updated: 'Livro atualizado com sucesso!',
     deleted: 'Livro excluído com sucesso!',
   },
+  loadFn: () =>
+    livroService.findAll({
+      titulo: filter.value,
+      disciplina: filtros.value.disciplina,
+      anoEscolar: filtros.value.anoEscolar,
+      edicao: filtros.value.edicao,
+    }),
 })
 
 const columns = [
   { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
-  { name: 'book', label: 'LIVRO', field: 'titulo', align: 'left', sortable: true },
-  { name: 'codigo', label: 'CÓDIGO', field: 'codigo', align: 'left', sortable: true },
-  { name: 'categoria', label: 'CATEGORIA', field: 'categoria', align: 'left', sortable: true },
-  { name: 'condicao', label: 'CONDIÇÃO', field: 'condicao', align: 'left', sortable: true },
-  { name: 'status', label: 'STATUS', field: 'status', align: 'left', sortable: true },
+  { name: 'book', label: 'TÍTULO', field: 'titulo', align: 'left', sortable: true },
+  { name: 'disciplina', label: 'DISCIPLINA', field: 'disciplina', align: 'left', sortable: true },
+  { name: 'anoEscolar', label: 'ANO ESCOLAR', field: 'anoEscolar', align: 'left', sortable: true },
+  { name: 'edicao', label: 'EDIÇÃO', field: 'edicao', align: 'left', sortable: true },
   { name: 'actions', label: 'AÇÕES', field: 'actions', align: 'center', sortable: false },
 ]
 
-const statusClass = (status) => {
-  if (status === 'Disponível') return 'ativo'
-  if (status === 'Emprestado') return 'pendente'
-  return 'inativo'
-}
+const filteredRows = computed(() => rows.value)
 
-const filteredRows = computed(() => {
-  if (!filter.value.trim()) return rows.value
-  const q = filter.value.toLowerCase()
-  return rows.value.filter(
-    (r) =>
-      r.titulo?.toLowerCase().includes(q) ||
-      r.codigo?.toLowerCase().includes(q) ||
-      r.autor?.toLowerCase().includes(q) ||
-      r.categoria?.toLowerCase().includes(q) ||
-      r.condicao?.toLowerCase().includes(q) ||
-      r.status?.toLowerCase().includes(q),
-  )
-})
+watch(
+  [filter, filtros],
+  () => {
+    clearTimeout(filtroTimeout)
+    filtroTimeout = setTimeout(load, 350)
+  },
+  { deep: true },
+)
 
 onMounted(load)
 </script>
+
+<style lang="scss" scoped>
+.book-subject {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: $tag-blue-bg;
+  color: $tag-blue-text;
+  font-size: 12px;
+  font-weight: 700;
+}
+</style>
