@@ -1,7 +1,5 @@
 <template>
-  <q-page padding class="q-pa-xl lib-page">
-    <PageHeader title="Turmas" subtitle="Gerenciamento de turmas por ano letivo" v-model="filter" />
-
+  <q-page padding class="q-px-xl q-pb-xl q-pt-lg lib-page">
     <div class="row q-col-gutter-lg q-mb-xl">
       <div class="col-12 col-md-4">
         <StatCardMini title="Turmas" :value="rows.length" icon="domain" theme="green" />
@@ -14,17 +12,34 @@
       </div>
     </div>
 
+    <div class="table-page-actions q-mb-md">
+      <q-btn unelevated color="primary" class="lib-action-btn" @click="openCreate">
+        <q-icon name="add" size="18px" class="q-mr-sm" />Nova Turma
+      </q-btn>
+    </div>
+
     <div class="lib-card">
-      <div class="row justify-between items-center q-px-lg q-py-md">
-        <div>
-          <h2 class="text-h6 text-weight-bold text-main q-ma-none">Lista de Turmas</h2>
-          <p class="text-caption text-muted q-mt-xs q-mb-none">
-            {{ rows.length }} turma{{ rows.length !== 1 ? 's' : '' }} cadastrada{{ rows.length !== 1 ? 's' : '' }}
-          </p>
+      <div class="table-toolbar q-px-lg q-py-md">
+        <div class="table-toolbar__main-row">
+          <div>
+            <h2 class="text-h6 text-weight-bold text-main q-ma-none">Lista de Turmas</h2>
+            <p class="text-caption text-muted q-mt-xs q-mb-none">
+              {{ rows.length }} turma{{ rows.length !== 1 ? 's' : '' }} cadastrada{{ rows.length !== 1 ? 's' : '' }}
+            </p>
+          </div>
+          <q-input
+            v-model="filter"
+            outlined
+            dense
+            placeholder="Buscar turmas..."
+            class="table-search-input bg-white"
+            rounded
+          >
+            <template v-slot:prepend>
+              <q-icon name="search" size="20px" color="grey-5" />
+            </template>
+          </q-input>
         </div>
-        <q-btn unelevated color="primary" class="lib-action-btn" @click="openCreate">
-          <q-icon name="add" size="18px" class="q-mr-sm" />Nova Turma
-        </q-btn>
       </div>
 
       <q-separator />
@@ -95,7 +110,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import PageHeader from 'src/components/PageHeader.vue'
 import StatCardMini from 'src/components/StatCardMini.vue'
 import ConfirmDialog from 'src/components/ConfirmDialog.vue'
 import TurmaFormDialog from 'src/components/crud/TurmaFormDialog.vue'

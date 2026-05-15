@@ -28,7 +28,7 @@ const handleLogin = async (credentials) => {
       message: 'Login realizado com sucesso!',
       icon: 'check_circle',
     })
-    router.push('/dashboard')
+    router.push('/painel')
   } catch (error) {
     $q.notify({
       color: 'negative',

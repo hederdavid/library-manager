@@ -1,41 +1,5 @@
 <template>
-  <q-page padding class="q-pa-xl loans-page">
-    <div class="header-row q-mb-xl">
-      <div class="header-title">
-        <h1 class="text-h4 text-weight-bold text-main q-ma-none">Empréstimos e Devoluções</h1>
-        <p class="text-subtitle2 text-muted q-mt-xs q-mb-none">Controle de empréstimos de livros</p>
-      </div>
-
-      <div class="header-actions flex items-center gap-md">
-        <q-input
-          outlined
-          dense
-          placeholder="Busca rápida..."
-          class="top-search-input bg-white"
-          rounded
-        >
-          <template v-slot:prepend>
-            <q-icon name="search" size="20px" color="grey-5" />
-          </template>
-        </q-input>
-
-        <q-btn round flat class="notification-btn bg-white shadow-1 text-grey-7">
-          <q-icon name="notifications_none" size="20px" />
-          <q-badge color="negative" floating rounded class="notification-dot"></q-badge>
-        </q-btn>
-
-        <q-avatar
-          size="44px"
-          font-size="16px"
-          color="primary"
-          text-color="white"
-          class="admin-avatar-top text-weight-bold"
-        >
-          AD
-        </q-avatar>
-      </div>
-    </div>
-
+  <q-page padding class="q-px-xl q-pb-xl q-pt-lg loans-page">
     <div class="row q-col-gutter-lg q-mb-xl">
       <div class="col-12 col-md-4">
         <StatCardMini title="Ativos" value="6" icon="schedule" theme="blue" />
@@ -55,7 +19,7 @@
         class="text-grey-7 custom-tabs"
         active-color="primary"
         indicator-color="primary"
-        align="left"
+        align="justify"
         narrow-indicator
       >
         <q-tab name="new" label="Nova Entrega" icon="add" class="tab-item custom-tab" />
@@ -106,45 +70,6 @@ const loansStore = useLoansStore()
 
 <style lang="scss" scoped>
 
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-title h1 {
-  font-size: 24px;
-}
-
-.notification-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: white !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
-  color: #64748b;
-}
-
-.notification-dot {
-  width: 9px;
-  height: 9px;
-  border: 2px solid white;
-  top: 10px;
-  right: 10px;
-}
-
-.top-search-input {
-  width: 250px;
-  :deep(.q-field__control) {
-    border-radius: 20px;
-    height: 40px;
-  }
-}
-
-.admin-avatar-top {
-  background-color: $primary !important;
-}
-
 .loans-content-card {
   background: white;
   border-radius: 20px;
@@ -156,9 +81,14 @@ const loansStore = useLoansStore()
 .custom-tabs {
   padding: 0 24px;
   background: $bg-input;
+
+  :deep(.q-tabs__content) {
+    width: 100%;
+  }
 }
 
 .tab-item {
+  flex: 1 1 0;
   min-height: 64px;
   padding: 0 24px;
   font-weight: 600;
