@@ -1,22 +1,22 @@
 <template>
   <BaseFormDialog
     :model-value="modelValue"
-    :title="editingId ? 'Editar Matéria' : 'Nova Matéria'"
-    subtitle="Preencha o nome da matéria / curso"
-    :submit-label="editingId ? 'Salvar Alterações' : 'Criar Matéria'"
+    :title="editingId ? 'Editar Curso' : 'Novo Curso'"
+    subtitle="Preencha o nome do curso"
+    :submit-label="editingId ? 'Salvar Alterações' : 'Criar Curso'"
     :saving="saving"
     :width="480"
     @update:model-value="$emit('update:modelValue', $event)"
     @close="$emit('close')"
     @save="$emit('save')"
   >
-    <label class="lib-form-label">Nome da Matéria *</label>
+    <label class="lib-form-label">Nome do Curso *</label>
     <q-input
       :model-value="form.nomeCurso"
       @update:model-value="$emit('update:form', { ...form, nomeCurso: $event })"
       outlined
       dense
-      placeholder="Ex: Programação Orientada a Objetos"
+      placeholder="Ex: Técnico em Informática"
       class="lib-form-field"
       :error="!!errors.nomeCurso"
       :error-message="errors.nomeCurso"

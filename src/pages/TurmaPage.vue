@@ -1,14 +1,17 @@
 <template>
   <q-page padding class="q-px-xl q-pb-xl q-pt-lg lib-page">
     <div class="row q-col-gutter-lg q-mb-xl">
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <StatCardMini title="Turmas" :value="rows.length" icon="domain" theme="green" />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <StatCardMini title="Campus" :value="campus.length" icon="location_city" theme="blue" />
       </div>
-      <div class="col-12 col-md-4">
-        <StatCardMini title="Matérias" :value="cursos.length" icon="bookmark" theme="orange" />
+      <div class="col-12 col-md-3">
+        <StatCardMini title="Cursos" :value="cursos.length" icon="school" theme="orange" />
+      </div>
+      <div class="col-12 col-md-3">
+        <StatCardMini title="Matérias" :value="materias.length" icon="bookmark" theme="purple" />
       </div>
     </div>
 
@@ -45,7 +48,7 @@
           outlined
           dense
           clearable
-          label="Matéria"
+          label="Curso"
           class="table-filter-field bg-white"
         />
         <q-input
@@ -62,11 +65,19 @@
         <q-td :props="props">
           <div class="text-weight-bold text-main">
             {{
-              props.row.curso?.nomeCurso || cursosMap[props.row.idCurso] || 'Matéria não informada'
+              props.row.curso?.nomeCurso || cursosMap[props.row.idCurso] || 'Curso não informado'
             }}
           </div>
           <div class="text-caption text-muted">
             ID {{ props.row.curso?.id || props.row.idCurso || 'não informado' }}
+          </div>
+        </q-td>
+      </template>
+
+      <template v-slot:body-cell-materias="props">
+        <q-td :props="props">
+          <div class="text-weight-bold text-main">
+            {{ props.row.materias?.map(m => m.nomeMateria).join(', ') || 'Nenhuma matéria' }}
           </div>
         </q-td>
       </template>
@@ -99,6 +110,7 @@
       :saving="saving"
       :curso-options="cursoOptions"
       :campus-options="campusOptions"
+      :materia-options="materiaOptions"
       @close="closeDialog"
       @save="save"
     />
@@ -128,6 +140,7 @@ import { useCrud } from 'src/composables/useCrud'
 import turmaService from 'src/services/turmaService'
 import campusService from 'src/services/campusService'
 import cursoService from 'src/services/cursoService'
+import materiaService from 'src/services/materiaService'
 
 const filter = ref('')
 const filtros = ref({
@@ -137,6 +150,7 @@ const filtros = ref({
 })
 const campus = ref([])
 const cursos = ref([])
+const materias = ref([])
 let filtroTimeout = null
 
 const {
@@ -164,12 +178,13 @@ const {
     serie: '',
     idCurso: null,
     idCampus: null,
+    materiasIds: [],
   }),
   validate: (f) => {
     const e = {}
     if (!f.anoLetivo || f.anoLetivo < 2000) e.anoLetivo = 'Ano letivo deve ser 2000 ou superior'
     if (!f.serie?.trim()) e.serie = 'Série é obrigatória'
-    if (f.idCurso == null) e.idCurso = 'Selecione uma matéria'
+    if (f.idCurso == null) e.idCurso = 'Selecione um curso'
     if (f.idCampus == null) e.idCampus = 'Selecione um campus'
     return e
   },
@@ -179,7 +194,7 @@ const {
     deleted: 'Turma excluída com sucesso!',
   },
   loadFn: async () => {
-    const [turmas, campusList, cursosList] = await Promise.all([
+    const [turmas, campusList, cursosList, materiasList] = await Promise.all([
       turmaService.findAll({
         serie: filter.value,
         anoLetivo: filtros.value.anoLetivo,
@@ -188,9 +203,11 @@ const {
       }),
       campusService.findAll(),
       cursoService.findAll(),
+      materiaService.getAll()
     ])
     campus.value = campusList
     cursos.value = cursosList
+    materias.value = materiasList
     return turmas
   },
 })
@@ -199,7 +216,8 @@ const columns = [
   { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
   { name: 'anoLetivo', label: 'ANO LETIVO', field: 'anoLetivo', align: 'left', sortable: true },
   { name: 'serie', label: 'SÉRIE', field: 'serie', align: 'left', sortable: true },
-  { name: 'curso', label: 'MATÉRIA', field: 'curso', align: 'left' },
+  { name: 'curso', label: 'CURSO', field: 'curso', align: 'left' },
+  { name: 'materias', label: 'MATÉRIAS', field: 'materias', align: 'left' },
   { name: 'campus', label: 'CAMPUS', field: 'campus', align: 'left' },
   { name: 'actions', label: 'AÇÕES', field: 'actions', align: 'center', sortable: false },
 ]
@@ -212,6 +230,7 @@ const cursoOptions = computed(() => cursos.value.map((c) => ({ label: c.nomeCurs
 const campusOptions = computed(() =>
   campus.value.map((c) => ({ label: `${c.nome} — ${c.cidade}`, value: c.id })),
 )
+const materiaOptions = computed(() => materias.value.map((m) => ({ label: m.nomeMateria, value: m.id })))
 
 const filteredRows = computed(() => rows.value)
 

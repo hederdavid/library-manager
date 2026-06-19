@@ -1,19 +1,29 @@
 <template>
   <q-page padding class="q-px-xl q-pb-xl q-pt-lg loans-page">
-    <MockDataBanner
-      :show="loansStore.usandoMockEmprestimos"
-      message="Dados demonstrativos: o backend ainda não possui API de empréstimos e devoluções."
-    />
-
     <div class="row q-col-gutter-lg q-mb-xl">
       <div class="col-12 col-md-4">
-        <StatCardMini title="Ativos" value="6" icon="schedule" theme="blue" />
+        <StatCardMini
+          title="Ativos"
+          :value="loansStore.statsAtivos"
+          icon="schedule"
+          theme="blue"
+        />
       </div>
       <div class="col-12 col-md-4">
-        <StatCardMini title="Atrasados" value="5" icon="report_problem" theme="red" />
+        <StatCardMini
+          title="Atrasados"
+          :value="loansStore.statsAtrasados"
+          icon="report_problem"
+          theme="red"
+        />
       </div>
       <div class="col-12 col-md-4">
-        <StatCardMini title="Devolvidos" value="4" icon="check_circle_outline" theme="green" />
+        <StatCardMini
+          title="Devolvidos"
+          :value="loansStore.statsDevolvidos"
+          icon="check_circle_outline"
+          theme="green"
+        />
       </div>
     </div>
 
@@ -32,14 +42,23 @@
           <div class="flex items-center gap-sm">
             <q-icon name="sync" size="20px" />
             <span class="text-weight-bold tab-label-text">Devolução</span>
-            <q-badge color="red-1" text-color="negative" class="tab-badge">5</q-badge>
+            <q-badge
+              v-if="loansStore.emprestimosPendentes.length"
+              color="red-1"
+              text-color="negative"
+              class="tab-badge"
+            >
+              {{ loansStore.emprestimosPendentes.length }}
+            </q-badge>
           </div>
         </q-tab>
         <q-tab name="history" class="tab-item custom-tab">
           <div class="flex items-center gap-sm">
             <q-icon name="text_snippet" size="20px" />
             <span class="text-weight-bold tab-label-text">Histórico</span>
-            <q-badge color="grey-2" text-color="grey-7" class="tab-badge">10</q-badge>
+            <q-badge color="grey-2" text-color="grey-7" class="tab-badge">
+              {{ loansStore.emprestimos.length }}
+            </q-badge>
           </div>
         </q-tab>
       </q-tabs>
@@ -64,14 +83,18 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
 import StatCardMini from 'src/components/StatCardMini.vue'
-import MockDataBanner from 'src/components/base/MockDataBanner.vue'
 import LoanNewTab from 'src/components/loans/LoanNewTab.vue'
 import LoanReturnTab from 'src/components/loans/LoanReturnTab.vue'
 import LoanHistoryTab from 'src/components/loans/LoanHistoryTab.vue'
 import { useLoansStore } from 'src/stores/loansStore'
 
 const loansStore = useLoansStore()
+
+onMounted(() => {
+  loansStore.carregarDados()
+})
 </script>
 
 <style lang="scss" scoped>

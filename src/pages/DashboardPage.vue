@@ -10,8 +10,8 @@
         message="Dados demonstrativos: o backend ainda não possui API de dashboard."
       />
       <DashboardStats :stats="stats" />
-      <DashboardCharts />
-      <DashboardPending />
+      <DashboardCharts :stats="stats" />
+      <DashboardPending :stats="stats" />
     </template>
   </q-page>
 </template>

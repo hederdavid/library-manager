@@ -33,21 +33,11 @@
         </q-card-section>
 
         <q-card-section class="custom-donut-legend">
-          <div class="legend-row">
-            <div class="legend-label"><span class="dot dot--novo"></span> Novo</div>
-            <div class="legend-value text-weight-bold">3</div>
-          </div>
-          <div class="legend-row">
-            <div class="legend-label"><span class="dot dot--bom"></span> Bom</div>
-            <div class="legend-value text-weight-bold">7</div>
-          </div>
-          <div class="legend-row">
-            <div class="legend-label"><span class="dot dot--regular"></span> Regular</div>
-            <div class="legend-value text-weight-bold">3</div>
-          </div>
-          <div class="legend-row">
-            <div class="legend-label"><span class="dot dot--ruim"></span> Ruim</div>
-            <div class="legend-value text-weight-bold">1</div>
+          <div class="legend-row" v-for="(item, index) in stats?.conditionStats" :key="index">
+            <div class="legend-label">
+              <span class="dot" :class="getColorClass(item.label)"></span> {{ item.label }}
+            </div>
+            <div class="legend-value text-weight-bold">{{ item.value }}</div>
           </div>
         </q-card-section>
       </q-card>
@@ -56,58 +46,87 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed } from 'vue'
 
-const areaOptions = ref({
-  chart: {
-    fontFamily: 'Inter, sans-serif',
-    toolbar: { show: false },
-    zoom: { enabled: false },
-  },
-  dataLabels: { enabled: false },
-  stroke: { curve: 'smooth', width: 3 },
-  colors: ['#397b4f'],
-  fill: {
-    type: 'gradient',
-    gradient: { shadeIntensity: 1, opacityFrom: 0.2, opacityTo: 0, stops: [0, 90, 100] },
-  },
-  xaxis: {
-    categories: ['Out', 'Nov', 'Dez', 'Jan', 'Fev', 'Mar'],
-    axisBorder: { show: false },
-    axisTicks: { show: false },
-  },
-  yaxis: {
-    min: 0,
-    max: 60,
-    tickAmount: 4,
-  },
-  grid: {
-    strokeDashArray: 4,
-    borderColor: '#f1f5f9',
-  },
+const props = defineProps({
+  stats: Object,
 })
 
-const areaSeries = ref([{ name: 'Empréstimos', data: [28, 35, 18, 42, 38, 45] }])
+function getColorClass(label) {
+  const map = {
+    Novo: 'dot--novo',
+    Conservado: 'dot--bom',
+    'Mal Conservado': 'dot--regular',
+    Inutilizado: 'dot--ruim',
+  }
+  return map[label] || 'dot--novo'
+}
 
-const donutOptions = ref({
-  chart: {
-    fontFamily: 'Inter, sans-serif',
-    type: 'donut',
-  },
-  labels: ['Novo', 'Bom', 'Regular', 'Ruim'],
-  colors: ['#397b4f', '#4caf50', '#ff9800', '#f44336'],
-  dataLabels: { enabled: false },
-  legend: { show: false },
-  stroke: { width: 2, colors: ['#fff'] },
-  plotOptions: {
-    pie: {
-      donut: { size: '70%' },
-      expandOnClick: false,
+const areaOptions = computed(() => {
+  const categories = props.stats?.monthlyMovement?.map((m) => m.month) || []
+  return {
+    chart: {
+      fontFamily: 'Inter, sans-serif',
+      toolbar: { show: false },
+      zoom: { enabled: false },
     },
-  },
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 3 },
+    colors: ['#397b4f', '#81c784'],
+    fill: {
+      type: 'gradient',
+      gradient: { shadeIntensity: 1, opacityFrom: 0.2, opacityTo: 0, stops: [0, 90, 100] },
+    },
+    xaxis: {
+      categories: categories,
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+    },
+    yaxis: {
+      min: 0,
+      tickAmount: 4,
+    },
+    grid: {
+      strokeDashArray: 4,
+      borderColor: '#f1f5f9',
+    },
+  }
 })
 
-const donutSeries = ref([3, 7, 3, 1])
+const areaSeries = computed(() => {
+  const loans = props.stats?.monthlyMovement?.map((m) => m.loans) || []
+  const returns = props.stats?.monthlyMovement?.map((m) => m.returns) || []
+
+  return [
+    { name: 'Empréstimos', data: loans },
+    { name: 'Devoluções', data: returns },
+  ]
+})
+
+const donutOptions = computed(() => {
+  const labels = props.stats?.conditionStats?.map((c) => c.label) || []
+  return {
+    chart: {
+      fontFamily: 'Inter, sans-serif',
+      type: 'donut',
+    },
+    labels: labels,
+    colors: ['#397b4f', '#4caf50', '#ff9800', '#f44336'],
+    dataLabels: { enabled: false },
+    legend: { show: false },
+    stroke: { width: 2, colors: ['#fff'] },
+    plotOptions: {
+      pie: {
+        donut: { size: '70%' },
+        expandOnClick: false,
+      },
+    },
+  }
+})
+
+const donutSeries = computed(() => {
+  return props.stats?.conditionStats?.map((c) => c.value) || []
+})
 </script>
 
 <style lang="scss" scoped>

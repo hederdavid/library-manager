@@ -41,7 +41,7 @@
     </div>
 
     <div class="q-mb-md">
-      <label class="lib-form-label">Matéria / Curso *</label>
+      <label class="lib-form-label">Curso *</label>
       <q-select
         :model-value="form.idCurso"
         @update:model-value="$emit('update:form', { ...form, idCurso: $event })"
@@ -56,6 +56,27 @@
         class="lib-form-field"
         :error="!!errors.idCurso"
         :error-message="errors.idCurso"
+      />
+    </div>
+
+    <div class="q-mb-md">
+      <label class="lib-form-label">Matérias</label>
+      <q-select
+        :model-value="form.materiasIds"
+        @update:model-value="$emit('update:form', { ...form, materiasIds: $event })"
+        :options="materiaOptions"
+        option-value="value"
+        option-label="label"
+        emit-value
+        map-options
+        multiple
+        use-chips
+        outlined
+        dense
+        placeholder="Selecione as matérias"
+        class="lib-form-field"
+        :error="!!errors.materiasIds"
+        :error-message="errors.materiasIds"
       />
     </div>
 
@@ -91,6 +112,7 @@ defineProps({
   saving: Boolean,
   cursoOptions: Array,
   campusOptions: Array,
+  materiaOptions: Array,
 })
 
 defineEmits(['update:modelValue', 'update:form', 'close', 'save'])

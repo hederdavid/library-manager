@@ -57,13 +57,28 @@ const routes = [
         },
       },
       {
-        path: '/materias',
+        path: '/cursos',
         component: () => import('pages/CursoPage.vue'),
         meta: {
-          title: 'Matérias',
-          subtitle: 'Gerenciamento de cursos e matérias',
+          title: 'Cursos',
+          subtitle: 'Gerenciamento de cursos do instituto',
         },
       },
+      {
+        path: '/materias',
+        name: 'materias',
+        component: () => import('pages/MateriaPage.vue'),
+        meta: { title: 'Matérias', subtitle: 'Cadastro de matérias' },
+      },
+      {
+        path: '/estoque',
+        component: () => import('pages/EstoquePage.vue'),
+        meta: {
+          title: 'Estoque',
+          subtitle: 'Controle de quantidades e condições dos livros',
+        },
+      },
+
       {
         path: '/campus',
         component: () => import('pages/CampusPage.vue'),
@@ -86,10 +101,7 @@ const routes = [
     path: '/loans',
     redirect: '/emprestimos',
   },
-  {
-    path: '/cursos',
-    redirect: '/materias',
-  },
+
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue'),

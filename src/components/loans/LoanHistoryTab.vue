@@ -6,7 +6,7 @@
           v-model="loansStore.historySearch"
           outlined
           dense
-          placeholder="Buscar por aluno, matrícula, livro ou código..."
+          placeholder="Buscar por aluno, matrícula ou livro..."
           bg-color="white"
         >
           <template v-slot:prepend>
@@ -19,7 +19,9 @@
           outlined
           dense
           v-model="loansStore.statusFilter"
-          :options="['Todos os status', 'Ativo', 'Devolvido', 'Atrasado']"
+          :options="statusOptions"
+          emit-value
+          map-options
           bg-color="white"
           class="status-filter"
         />
@@ -35,47 +37,55 @@
       class="history-table"
       :pagination="{ rowsPerPage: 10 }"
       no-data-label="Nenhum empréstimo encontrado"
+      :loading="loansStore.loading"
     >
-      <template v-slot:body-cell-condition="props">
+      <template v-slot:body-cell-condEntrega="props">
         <q-td :props="props">
-          <div class="flex items-center gap-xs">
-            <q-icon name="north" size="12px" color="positive" v-if="props.value === 'Novo'" />
-            <span class="condition-tag" :class="`tag--${props.value.toLowerCase()}`">{{
-              props.value
-            }}</span>
-          </div>
+          <span class="condition-tag" :class="`condition-tag--${conditionClass(props.value)}`">
+            {{ conditionLabel(props.value) }}
+          </span>
+        </q-td>
+      </template>
+
+      <template v-slot:body-cell-condDevolucao="props">
+        <q-td :props="props">
+          <span
+            v-if="props.value"
+            class="condition-tag"
+            :class="`condition-tag--${conditionClass(props.value)}`"
+          >
+            {{ conditionLabel(props.value) }}
+          </span>
+          <span v-else class="text-muted">-</span>
         </q-td>
       </template>
 
       <template v-slot:body-cell-status="props">
         <q-td :props="props">
-          <q-badge unelevated class="status-badge" :class="`status--${props.value.toLowerCase()}`">
-            <q-icon
-              :name="
-                props.value === 'Atrasado'
-                  ? 'report_problem'
-                  : props.value === 'Ativo'
-                    ? 'schedule'
-                    : 'check_circle'
-              "
-              size="12px"
-              class="q-mr-xs"
-            />
-            {{ props.value }}
+          <q-badge unelevated class="status-badge" :class="`status--${props.value?.toLowerCase()}`">
+            <q-icon :name="statusIcon(props.value)" size="12px" class="q-mr-xs" />
+            {{ statusLabel(props.value) }}
           </q-badge>
         </q-td>
       </template>
 
       <template v-slot:body-cell-student="props">
         <q-td :props="props">
-          <div class="text-weight-bold text-main">{{ props.row.studentName }}</div>
-          <div class="text-caption text-muted">{{ props.row.studentId }}</div>
+          <div class="text-weight-bold text-main">{{ props.row.alunoNome }}</div>
+          <div class="text-caption text-muted">{{ props.row.alunoMatricula }}</div>
         </q-td>
       </template>
 
       <template v-slot:body-cell-book="props">
         <q-td :props="props">
-          <div class="text-weight-bold text-main">{{ props.row.bookTitle }}</div>
+          <div class="text-weight-bold text-main">{{ props.row.livroTitulo }}</div>
+          <div class="text-caption text-muted">{{ props.row.livroDisciplina }}</div>
+        </q-td>
+      </template>
+      
+      <template v-slot:body-cell-returnDate="props">
+        <q-td :props="props">
+          {{ props.value || '-' }}
         </q-td>
       </template>
     </q-table>
@@ -86,6 +96,53 @@
 import { useLoansStore } from 'src/stores/loansStore'
 
 const loansStore = useLoansStore()
+
+const statusOptions = [
+  { label: 'Todos os status', value: null },
+  { label: 'Ativo', value: 'EMPRESTADO' },
+  { label: 'Devolvido', value: 'DEVOLVIDO' },
+  { label: 'Atrasado', value: 'ATRASADO' },
+]
+
+function conditionLabel(value) {
+  const map = {
+    NOVO: 'Novo',
+    CONSERVADO: 'Conservado',
+    MAL_CONSERVADO: 'Mal Conservado',
+    INUTILIZADO: 'Inutilizado',
+  }
+  return map[value] || value || '-'
+}
+
+function conditionClass(value) {
+  const map = {
+    NOVO: 'novo',
+    CONSERVADO: 'conservado',
+    MAL_CONSERVADO: 'mal-conservado',
+    INUTILIZADO: 'inutilizado',
+  }
+  return map[value] || ''
+}
+
+function statusLabel(value) {
+  const map = {
+    EMPRESTADO: 'Ativo',
+    DEVOLVIDO: 'Devolvido',
+    ATRASADO: 'Atrasado',
+    CANCELADO: 'Cancelado',
+  }
+  return map[value] || value || '-'
+}
+
+function statusIcon(value) {
+  const map = {
+    EMPRESTADO: 'schedule',
+    DEVOLVIDO: 'check_circle',
+    ATRASADO: 'report_problem',
+    CANCELADO: 'cancel',
+  }
+  return map[value] || 'help_outline'
+}
 </script>
 
 <style lang="scss" scoped>
@@ -103,22 +160,31 @@ const loansStore = useLoansStore()
 }
 
 .status-filter {
-  min-width: 150px;
+  min-width: 160px;
 }
 
 .condition-tag {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 6px;
   font-size: 11px;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 4px;
 
-  &.tag--novo {
+  &--novo {
     color: $tag-green-text;
     background: $tag-green-bg;
   }
-  &.tag--bom {
+  &--conservado {
     color: $tag-blue-text;
     background: $tag-blue-bg;
+  }
+  &--mal-conservado {
+    color: $badge-orange-text;
+    background: $badge-orange-bg;
+  }
+  &--inutilizado {
+    color: $tag-red-text;
+    background: $tag-red-bg;
   }
 }
 
@@ -132,13 +198,17 @@ const loansStore = useLoansStore()
     color: $tag-green-text;
     background: $tag-green-bg;
   }
-  &.status--ativo {
+  &.status--emprestado {
     color: $tag-blue-text;
     background: $tag-blue-bg;
   }
   &.status--atrasado {
     color: $tag-red-text;
     background: $tag-red-bg;
+  }
+  &.status--cancelado {
+    color: $text-muted;
+    background: $border-input;
   }
 }
 </style>

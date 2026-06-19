@@ -97,6 +97,38 @@
           <q-item
             clickable
             v-ripple
+            to="/estoque"
+            exact
+            active-class="menu-item--active"
+            class="menu-item"
+          >
+            <q-item-section avatar class="item-icon-section">
+              <div class="icon-box">
+                <q-icon name="inventory_2" size="20px" />
+              </div>
+            </q-item-section>
+            <q-item-section class="item-text"> Estoque </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            v-ripple
+            to="/cursos"
+            exact
+            active-class="menu-item--active"
+            class="menu-item"
+          >
+            <q-item-section avatar class="item-icon-section">
+              <div class="icon-box">
+                <q-icon name="school" size="20px" />
+              </div>
+            </q-item-section>
+            <q-item-section class="item-text"> Cursos </q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            v-ripple
             to="/materias"
             exact
             active-class="menu-item--active"

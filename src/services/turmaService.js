@@ -5,6 +5,7 @@ function normalizarTurma(turma) {
     ...turma,
     idCurso: turma.idCurso ?? turma.curso?.id ?? null,
     idCampus: turma.idCampus ?? turma.campus?.id ?? null,
+    materiasIds: turma.materias ? turma.materias.map(m => m.id) : [],
   }
 }
 
@@ -14,6 +15,7 @@ function toDto(data) {
     serie: data.serie,
     idCurso: data.idCurso,
     idCampus: data.idCampus,
+    materiasIds: data.materiasIds || [],
   }
 }
 

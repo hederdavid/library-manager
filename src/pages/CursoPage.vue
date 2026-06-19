@@ -2,19 +2,19 @@
   <q-page padding class="q-px-xl q-pb-xl q-pt-lg lib-page">
     <div class="table-page-actions q-mb-md">
       <q-btn unelevated color="primary" class="lib-action-btn" @click="openCreate">
-        <q-icon name="add" size="18px" class="q-mr-sm" />Nova Matéria
+        <q-icon name="add" size="18px" class="q-mr-sm" />Novo Curso
       </q-btn>
     </div>
 
     <BaseDataTable
       v-model:filter="filter"
-      title="Lista de Matérias"
-      :subtitle="`${rows.length} matéria${rows.length !== 1 ? 's' : ''} cadastrada${rows.length !== 1 ? 's' : ''}`"
+      title="Lista de Cursos"
+      :subtitle="`${rows.length} curso${rows.length !== 1 ? 's' : ''} cadastrado${rows.length !== 1 ? 's' : ''}`"
       :rows="filteredRows"
       :columns="columns"
       :loading="loading"
-      search-placeholder="Buscar matérias..."
-      empty-label="Nenhuma matéria cadastrada"
+      search-placeholder="Buscar cursos..."
+      empty-label="Nenhum curso cadastrado"
       @edit="openEdit"
       @delete="confirmDelete"
     />
@@ -31,8 +31,8 @@
 
     <ConfirmDialog
       v-model="confirmOpen"
-      title="Excluir Matéria"
-      message="Deseja excluir a matéria "
+      title="Excluir Curso"
+      message="Deseja excluir o curso "
       :highlight="pendingDelete?.nomeCurso"
       details="? Esta ação não pode ser desfeita."
       icon="delete_outline"
@@ -82,9 +82,9 @@ const {
     return e
   },
   messages: {
-    created: 'Matéria criada com sucesso!',
-    updated: 'Matéria atualizada com sucesso!',
-    deleted: 'Matéria excluída com sucesso!',
+    created: 'Curso criado com sucesso!',
+    updated: 'Curso atualizado com sucesso!',
+    deleted: 'Curso excluído com sucesso!',
   },
   loadFn: () =>
     cursoService.findAll({
@@ -96,7 +96,7 @@ const columns = [
   { name: 'id', label: 'ID', field: 'id', align: 'left', sortable: true },
   {
     name: 'nomeCurso',
-    label: 'NOME DA MATÉRIA',
+    label: 'NOME DO CURSO',
     field: 'nomeCurso',
     align: 'left',
     sortable: true,

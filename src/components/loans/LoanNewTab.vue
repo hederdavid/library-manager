@@ -12,124 +12,87 @@
     <div class="form-body q-mt-lg">
       <div class="form-section">
         <label class="form-label">
-          <q-icon name="person_outline" size="18px" class="q-mr-xs" /> Aluno
+          <q-icon name="person_outline" size="18px" class="q-mr-xs" /> Aluno *
         </label>
         <q-select
-          v-model="loansStore.form.student"
+          v-model="loansStore.form.alunoId"
           outlined
           dense
           use-input
+          emit-value
+          map-options
           input-debounce="300"
           placeholder="Buscar por nome ou matrícula..."
-          :options="loansStore.studentOptions"
+          :options="filteredAlunoOptions"
+          :loading="loansStore.loading"
           class="custom-field"
+          @filter="filterAlunos"
         >
           <template v-slot:prepend>
             <q-icon name="search" size="20px" color="grey-6" />
+          </template>
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-muted"> Nenhum aluno encontrado </q-item-section>
+            </q-item>
           </template>
         </q-select>
       </div>
 
       <div class="form-section q-mt-lg">
         <label class="form-label">
-          <q-icon name="menu_book" size="18px" class="q-mr-xs" /> Livro (por código)
+          <q-icon name="menu_book" size="18px" class="q-mr-xs" /> Livro *
         </label>
-        <div class="row q-col-gutter-sm">
-          <div class="col">
-            <q-input
-              v-model="loansStore.form.bookCode"
-              outlined
-              dense
-              placeholder="EX: INF-001"
-              class="custom-field"
-            />
-          </div>
-          <div class="col-auto">
-            <q-btn
-              unelevated
-              color="primary"
-              label="Buscar"
-              class="search-btn"
-              :loading="loansStore.searchingBook"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div class="row q-col-gutter-lg q-mt-md">
-        <div class="col-12 col-md-6">
-          <label class="form-label">
-            <q-icon name="calendar_today" size="18px" class="q-mr-xs" /> Data de Saída
-          </label>
-          <q-input
-            v-model="loansStore.form.startDate"
-            outlined
-            dense
-            mask="####-##-##"
-            class="custom-field"
-          >
-            <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer" size="20px" color="primary">
-                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                  <q-date v-model="loansStore.form.startDate" mask="YYYY-MM-DD" color="primary">
-                    <div class="row items-center justify-end">
-                      <q-btn v-close-popup label="Fechar" color="primary" flat />
-                    </div>
-                  </q-date>
-                </q-popup-proxy>
-              </q-icon>
-            </template>
-          </q-input>
-        </div>
-        <div class="col-12 col-md-6">
-          <label class="form-label">
-            <q-icon name="event_available" size="18px" class="q-mr-xs" /> Devolução Prevista *
-          </label>
-          <q-input
-            v-model="loansStore.form.dueDate"
-            outlined
-            dense
-            mask="####-##-##"
-            class="custom-field"
-          >
-            <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer" size="20px" color="primary">
-                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                  <q-date v-model="loansStore.form.dueDate" mask="YYYY-MM-DD" color="primary">
-                    <div class="row items-center justify-end">
-                      <q-btn v-close-popup label="Fechar" color="primary" flat />
-                    </div>
-                  </q-date>
-                </q-popup-proxy>
-              </q-icon>
-            </template>
-          </q-input>
-        </div>
+        <q-select
+          v-model="loansStore.form.livroId"
+          outlined
+          dense
+          use-input
+          emit-value
+          map-options
+          input-debounce="300"
+          placeholder="Buscar por título ou disciplina..."
+          :options="filteredLivroOptions"
+          :loading="loansStore.loading"
+          class="custom-field"
+          @filter="filterLivros"
+        >
+          <template v-slot:prepend>
+            <q-icon name="search" size="20px" color="grey-6" />
+          </template>
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-muted"> Nenhum livro encontrado </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
       </div>
 
       <div class="form-section q-mt-lg">
-        <label class="form-label">Condição do Livro na Entrega</label>
+        <label class="form-label">Condição do Livro na Entrega *</label>
         <div class="condition-toggle-row">
           <q-btn-toggle
-            v-model="loansStore.form.condition"
+            v-model="loansStore.form.condicaoEntrega"
             toggle-color="primary"
             text-color="grey-7"
             unelevated
             flat
             padding="8px 24px"
             class="custom-toggle"
-            :options="[
-              { label: 'Novo', value: 'novo' },
-              { label: 'Bom', value: 'bom' },
-              { label: 'Regular', value: 'regular' },
-              { label: 'Ruim', value: 'ruim' },
-            ]"
+            :options="condicaoOptions"
           />
         </div>
       </div>
 
       <div class="form-actions q-mt-xl">
-        <q-btn unelevated color="secondary" class="submit-btn full-width" @click="submitLoan">
+        <q-btn
+          unelevated
+          color="secondary"
+          class="submit-btn full-width"
+          :loading="loansStore.submitting"
+          :disable="!canSubmit"
+          @click="submitLoan"
+        >
           <q-icon name="swap_horiz" class="q-mr-sm" /> Registrar Empréstimo
         </q-btn>
       </div>
@@ -138,15 +101,48 @@
 </template>
 
 <script setup>
-import { useNotify } from 'src/composables/useNotify'
+import { ref, computed } from 'vue'
 import { useLoansStore } from 'src/stores/loansStore'
 
-const notify = useNotify()
 const loansStore = useLoansStore()
 
-const submitLoan = () => {
-  notify.success('Empréstimo registrado com sucesso!')
-  loansStore.resetForm()
+const condicaoOptions = [
+  { label: 'Novo', value: 'NOVO' },
+  { label: 'Conservado', value: 'CONSERVADO' },
+  { label: 'Mal Conservado', value: 'MAL_CONSERVADO' },
+  { label: 'Inutilizado', value: 'INUTILIZADO' },
+]
+
+const filteredAlunoOptions = ref(loansStore.alunoOptions)
+const filteredLivroOptions = ref(loansStore.livroOptions)
+
+function filterAlunos(val, update) {
+  update(() => {
+    const needle = val.toLowerCase()
+    filteredAlunoOptions.value = loansStore.alunoOptions.filter((opt) =>
+      opt.label.toLowerCase().includes(needle),
+    )
+  })
+}
+
+function filterLivros(val, update) {
+  update(() => {
+    const needle = val.toLowerCase()
+    filteredLivroOptions.value = loansStore.livroOptions.filter((opt) =>
+      opt.label.toLowerCase().includes(needle),
+    )
+  })
+}
+
+const canSubmit = computed(
+  () =>
+    loansStore.form.alunoId !== null &&
+    loansStore.form.livroId !== null &&
+    loansStore.form.condicaoEntrega,
+)
+
+const submitLoan = async () => {
+  await loansStore.criarEmprestimo()
 }
 </script>
 
@@ -169,13 +165,6 @@ const submitLoan = () => {
 .custom-field :deep(.q-field__control) {
   border-radius: 10px;
   background: $bg-input;
-}
-
-.search-btn {
-  height: 40px;
-  padding: 0 24px;
-  border-radius: 10px;
-  background: $primary !important;
 }
 
 .condition-toggle-row {

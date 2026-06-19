@@ -1,7 +1,7 @@
 export const mockConfig = {
   // Backend atual ainda nao possui controllers para estes modulos.
   // Quando a API existir, remova o mock e conecte o service real.
-  usarMockDashboard: true,
+  usarMockDashboard: false,
   usarMockAutenticacao: true,
-  usarMockEmprestimos: true,
+  usarMockEmprestimos: false,
 }

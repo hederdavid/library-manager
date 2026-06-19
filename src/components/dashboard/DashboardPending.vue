@@ -1,5 +1,6 @@
 <template>
   <div class="row q-col-gutter-lg">
+    <!-- Empréstimos Atrasados -->
     <div class="col-12 col-md-7">
       <q-card flat bordered class="list-card">
         <q-card-section class="list-header">
@@ -12,26 +13,33 @@
               <div class="text-caption text-muted">Ação necessária</div>
             </div>
           </div>
-          <q-badge unelevated class="header-badge header-badge--danger"> 5 atrasos </q-badge>
+          <q-badge unelevated class="header-badge header-badge--danger">
+            {{ overdueLoans.length }} atrasos
+          </q-badge>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-list class="custom-list">
-            <q-item v-for="i in 3" :key="i" class="list-item">
+          <div v-if="overdueLoans.length === 0" class="text-center text-muted q-py-lg">
+            Nenhum empréstimo atrasado.
+          </div>
+          <q-list v-else class="custom-list">
+            <q-item v-for="item in overdueLoans" :key="item.id" class="list-item">
               <q-item-section avatar>
-                <div class="days-badge bg-red-1 text-negative">13d</div>
+                <div class="days-badge bg-red-1 text-negative">{{ item.daysOverdue }}d</div>
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-weight-bold text-main list-item-title"
-                  >Maria Fernanda Santos</q-item-label
-                >
-                <q-item-label caption class="text-muted">Algoritmos: Teoria e Prática</q-item-label>
+                <q-item-label class="text-weight-bold text-main list-item-title">
+                  {{ item.studentName }}
+                </q-item-label>
+                <q-item-label caption class="text-muted text-ellipsis">
+                  {{ item.bookTitle }}
+                </q-item-label>
               </q-item-section>
               <q-item-section side class="items-end">
-                <q-item-label class="text-weight-bold text-negative opacity-80"
-                  >13 dias atraso</q-item-label
-                >
-                <q-item-label caption>Venceu: 10/03</q-item-label>
+                <q-item-label class="text-weight-bold text-negative opacity-80">
+                  {{ item.daysOverdue }} dias de atraso
+                </q-item-label>
+                <q-item-label caption>Venceu: {{ item.dueDate }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -39,6 +47,7 @@
       </q-card>
     </div>
 
+    <!-- Próximas Devoluções -->
     <div class="col-12 col-md-5">
       <q-card flat bordered class="list-card">
         <q-card-section class="list-header">
@@ -51,25 +60,32 @@
               <div class="text-caption text-muted">Próximos 10 dias</div>
             </div>
           </div>
-          <q-badge unelevated class="header-badge header-badge--success"> 1 devol. </q-badge>
+          <q-badge unelevated class="header-badge header-badge--success">
+            {{ upcomingReturns.length }} devol.
+          </q-badge>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <q-list class="custom-list">
-            <q-item class="list-item">
+          <div v-if="upcomingReturns.length === 0" class="text-center text-muted q-py-lg">
+            Nenhuma devolução próxima.
+          </div>
+          <q-list v-else class="custom-list">
+            <q-item v-for="item in upcomingReturns" :key="item.id" class="list-item">
               <q-item-section avatar>
-                <div class="days-badge bg-green-1 text-primary">8d</div>
+                <div class="days-badge bg-green-1 text-primary">{{ item.daysLeft }}d</div>
               </q-item-section>
               <q-item-section>
-                <q-item-label class="text-weight-bold text-main list-item-title"
-                  >João Pedro Silva</q-item-label
-                >
-                <q-item-label caption class="text-muted text-ellipsis pending-book-title"
-                  >Programação Orientada a Objetos - INF-013</q-item-label
-                >
+                <q-item-label class="text-weight-bold text-main list-item-title">
+                  {{ item.studentName }}
+                </q-item-label>
+                <q-item-label caption class="text-muted text-ellipsis pending-book-title">
+                  {{ item.bookTitle }}
+                </q-item-label>
               </q-item-section>
               <q-item-section side class="items-end">
-                <q-item-label caption class="text-weight-bold text-primary">01/04</q-item-label>
+                <q-item-label caption class="text-weight-bold text-primary">
+                  {{ item.dueDate }}
+                </q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -78,6 +94,22 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { computed } from 'vue'
+
+const props = defineProps({
+  stats: Object,
+})
+
+const overdueLoans = computed(() => {
+  return props.stats?.overdueLoans || []
+})
+
+const upcomingReturns = computed(() => {
+  return props.stats?.upcomingReturns || []
+})
+</script>
 
 <style lang="scss" scoped>
 .list-card {

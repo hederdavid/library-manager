@@ -40,12 +40,13 @@
       </div>
       <div class="col-12 col-sm-6">
         <label class="lib-form-label">Ano Escolar *</label>
-        <q-input
+        <q-select
           :model-value="form.anoEscolar"
           @update:model-value="$emit('update:form', { ...form, anoEscolar: $event })"
+          :options="['1º ano', '2º ano', '3º ano']"
           outlined
           dense
-          placeholder="Ex: 1º ano"
+          placeholder="Selecione o ano escolar"
           class="lib-form-field"
           :error="!!errors.anoEscolar"
           :error-message="errors.anoEscolar"
